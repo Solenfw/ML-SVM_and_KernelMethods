@@ -1,0 +1,183 @@
+% ---------------------------------------------------------------------
+%  5 tài liệu đầu là tài liệu tham khảo bắt buộc của đề bài.
+%  Các mục còn lại là nguồn cho thuật toán / phương pháp dùng trong bài.
+%  Key dạng: tácgiảđầu + năm + từ khóa. Thêm mục mới → báo P1.
+% ---------------------------------------------------------------------
+
+% ======== Tài liệu của đề bài ========
+@article{cortes1995support,
+  author  = {Cortes, Corinna and Vapnik, Vladimir},
+  title   = {Support-vector networks},
+  journal = {Machine Learning},
+  volume  = {20},
+  number  = {3},
+  pages   = {273--297},
+  year    = {1995},
+  doi     = {10.1007/BF00994018}
+}
+
+@techreport{platt1998smo,
+  author      = {Platt, John C.},
+  title       = {Sequential Minimal Optimization: A Fast Algorithm for Training Support Vector Machines},
+  institution = {Microsoft Research},
+  number      = {MSR-TR-98-14},
+  year        = {1998}
+}
+
+@incollection{platt1999probabilistic,
+  author    = {Platt, John C.},
+  title     = {Probabilistic Outputs for Support Vector Machines and Comparisons to Regularized Likelihood Methods},
+  booktitle = {Advances in Large Margin Classifiers},
+  editor    = {Smola, Alexander J. and Bartlett, Peter and Sch{\"o}lkopf, Bernhard and Schuurmans, Dale},
+  publisher = {MIT Press},
+  pages     = {61--74},
+  year      = {1999}
+}
+
+@inproceedings{scholkopf2001generalized,
+  author    = {Sch{\"o}lkopf, Bernhard and Herbrich, Ralf and Smola, Alexander J.},
+  title     = {A Generalized Representer Theorem},
+  booktitle = {Computational Learning Theory (COLT 2001)},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {2111},
+  pages     = {416--426},
+  publisher = {Springer},
+  year      = {2001}
+}
+
+@book{scholkopf2002learning,
+  author    = {Sch{\"o}lkopf, Bernhard and Smola, Alexander J.},
+  title     = {Learning with Kernels: Support Vector Machines, Regularization, Optimization, and Beyond},
+  publisher = {MIT Press},
+  year      = {2002}
+}
+
+% ======== Lý thuyết (P1) ========
+@article{aronszajn1950theory,
+  author  = {Aronszajn, Nachman},
+  title   = {Theory of Reproducing Kernels},
+  journal = {Transactions of the American Mathematical Society},
+  volume  = {68},
+  number  = {3},
+  pages   = {337--404},
+  year    = {1950}
+}
+
+@book{vapnik1995nature,
+  author    = {Vapnik, Vladimir N.},
+  title     = {The Nature of Statistical Learning Theory},
+  publisher = {Springer},
+  year      = {1995}
+}
+
+@book{horn2012matrix,
+  author    = {Horn, Roger A. and Johnson, Charles R.},
+  title     = {Matrix Analysis},
+  edition   = {2},
+  publisher = {Cambridge University Press},
+  year      = {2012}
+}
+
+@book{boyd2004convex,
+  author    = {Boyd, Stephen and Vandenberghe, Lieven},
+  title     = {Convex Optimization},
+  publisher = {Cambridge University Press},
+  year      = {2004}
+}
+
+% ======== Thuật toán (P2) ========
+@article{keerthi2001improvements,
+  author  = {Keerthi, S. Sathiya and Shevade, Shirish K. and Bhattacharyya, Chiranjib and Murthy, K. R. K.},
+  title   = {Improvements to {P}latt's {SMO} Algorithm for {SVM} Classifier Design},
+  journal = {Neural Computation},
+  volume  = {13},
+  number  = {3},
+  pages   = {637--649},
+  year    = {2001}
+}
+
+@article{fan2005working,
+  author  = {Fan, Rong-En and Chen, Pai-Hsuen and Lin, Chih-Jen},
+  title   = {Working Set Selection Using Second Order Information for Training Support Vector Machines},
+  journal = {Journal of Machine Learning Research},
+  volume  = {6},
+  pages   = {1889--1918},
+  year    = {2005}
+}
+
+@inproceedings{hsieh2008dual,
+  author    = {Hsieh, Cho-Jui and Chang, Kai-Wei and Lin, Chih-Jen and Keerthi, S. Sathiya and Sundararajan, S.},
+  title     = {A Dual Coordinate Descent Method for Large-scale Linear {SVM}},
+  booktitle = {Proceedings of the 25th International Conference on Machine Learning (ICML)},
+  pages     = {408--415},
+  year      = {2008}
+}
+
+@article{lin2007note,
+  author  = {Lin, Hsuan-Tien and Lin, Chih-Jen and Weng, Ruby C.},
+  title   = {A Note on {P}latt's Probabilistic Outputs for Support Vector Machines},
+  journal = {Machine Learning},
+  volume  = {68},
+  number  = {3},
+  pages   = {267--276},
+  year    = {2007}
+}
+
+@article{wu2004probability,
+  author  = {Wu, Ting-Fan and Lin, Chih-Jen and Weng, Ruby C.},
+  title   = {Probability Estimates for Multi-class Classification by Pairwise Coupling},
+  journal = {Journal of Machine Learning Research},
+  volume  = {5},
+  pages   = {975--1005},
+  year    = {2004}
+}
+
+@article{chang2011libsvm,
+  author  = {Chang, Chih-Chung and Lin, Chih-Jen},
+  title   = {{LIBSVM}: A Library for Support Vector Machines},
+  journal = {ACM Transactions on Intelligent Systems and Technology},
+  volume  = {2},
+  number  = {3},
+  pages   = {27:1--27:27},
+  year    = {2011}
+}
+
+@article{pedregosa2011scikit,
+  author  = {Pedregosa, Fabian and others},
+  title   = {Scikit-learn: Machine Learning in {P}ython},
+  journal = {Journal of Machine Learning Research},
+  volume  = {12},
+  pages   = {2825--2830},
+  year    = {2011}
+}
+
+% ======== Xử lý ảnh (P3) ========
+@article{otsu1979threshold,
+  author  = {Otsu, Nobuyuki},
+  title   = {A Threshold Selection Method from Gray-Level Histograms},
+  journal = {IEEE Transactions on Systems, Man, and Cybernetics},
+  volume  = {9},
+  number  = {1},
+  pages   = {62--66},
+  year    = {1979}
+}
+
+@article{vincent1991watersheds,
+  author  = {Vincent, Luc and Soille, Pierre},
+  title   = {Watersheds in Digital Spaces: An Efficient Algorithm Based on Immersion Simulations},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  volume  = {13},
+  number  = {6},
+  pages   = {583--598},
+  year    = {1991}
+}
+
+@article{haralick1973textural,
+  author  = {Haralick, Robert M. and Shanmugam, K. and Dinstein, Its'hak},
+  title   = {Textural Features for Image Classification},
+  journal = {IEEE Transactions on Systems, Man, and Cybernetics},
+  volume  = {SMC-3},
+  number  = {6},
+  pages   = {610--621},
+  year    = {1973}
+}

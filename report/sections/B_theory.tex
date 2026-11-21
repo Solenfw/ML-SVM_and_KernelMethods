@@ -1,0 +1,170 @@
+% =====================================================================
+%  Phần B: Chứng minh lý thuyết (P1)
+%  Đã có phát biểu chính xác của từng kết quả; cần viết phần chứng minh.
+% =====================================================================
+\section{Cơ sở lý thuyết}\label{sec:theory}
+\owner{P1}
+
+% ---------------------------------------------------------------------
+\subsection{B1. Khoảng cách tới siêu phẳng và bài toán lề cứng}\label{sec:B1}
+
+\begin{proposition}\label{prop:B1-distance}
+Cho $\vw \in \R^d \setminus \{\vzero\}$, $b \in \R$ và siêu phẳng
+$H = \{\vz \in \R^d : \vw\T\vz + b = 0\}$. Với mọi $\vx \in \R^d$,
+\[
+  \operatorname{dist}(\vx, H) \coloneqq \min_{\vz \in H} \norm{\vx - \vz}
+  = \frac{\abs{\vw\T\vx + b}}{\norm{\vw}}.
+\]
+\end{proposition}
+
+\begin{proof}
+\todo{B1, phần khoảng cách: Cauchy--Schwarz cho cận dưới, chỉ ra điểm đạt dấu bằng.}
+\end{proof}
+
+\begin{proposition}\label{prop:B1-hardmargin}
+Giả sử dữ liệu $\{(\vx_i, y_i)\}_{i=1}^n$ khả tách tuyến tính. Bài toán cực đại
+lề hình học
+\begin{equation}\label{eq:B1-maxmargin}
+  \max_{\vw \ne \vzero,\, b} \; \min_{1 \le i \le n} \frac{y_i(\vw\T\vx_i + b)}{\norm{\vw}}
+\end{equation}
+tương đương với bài toán
+\begin{equation}\label{eq:B1-hardmargin}
+  \min_{\vw, b} \; \frac{1}{2}\norm{\vw}^2
+  \quad \text{với ràng buộc} \quad y_i(\vw\T\vx_i + b) \ge 1, \; i = 1, \dots, n,
+\end{equation}
+theo nghĩa: siêu phẳng tối ưu của hai bài toán trùng nhau, và lề cực đại bằng $1/\norm{\vw^\star}$.
+\end{proposition}
+
+\begin{proof}
+\todo{B1, phần tương đương: bất biến tỉ lệ, chuẩn hóa $\min_i y_i(\vw\T\vx_i+b) = 1$,
+chứng minh có ràng buộc đạt dấu bằng tại nghiệm của \eqref{eq:B1-hardmargin}.}
+\end{proof}
+
+% ---------------------------------------------------------------------
+\subsection{B2. Bài toán đối ngẫu của SVM lề mềm và điều kiện KKT}\label{sec:B2}
+
+Với ánh xạ đặc trưng $\phi$ thỏa $k(\vx, \vz) = \inner{\phi(\vx)}{\phi(\vz)}$,
+bài toán gốc của SVM lề mềm là
+\begin{equation}\label{eq:B2-primal}
+  \min_{\vw, b, \vxi} \; \frac{1}{2}\norm{\vw}^2 + C\sum_{i=1}^n \xi_i
+  \quad \text{với ràng buộc} \quad
+  y_i\bigl(\vw\T\phi(\vx_i) + b\bigr) \ge 1 - \xi_i, \;\; \xi_i \ge 0.
+\end{equation}
+
+\begin{theorem}\label{thm:B2-dual}
+Bài toán đối ngẫu của \eqref{eq:B2-primal} là
+\begin{equation}\label{eq:B2-dual}
+  \max_{\valpha} \; \Dual(\valpha) = \sum_{i=1}^n \alpha_i
+  - \frac{1}{2}\sum_{i,j=1}^n \alpha_i\alpha_j y_i y_j k(\vx_i, \vx_j)
+  \quad \text{với ràng buộc} \quad
+  0 \le \alpha_i \le C, \;\; \sum_{i=1}^n \alpha_i y_i = 0,
+\end{equation}
+và tại nghiệm $\vw^\star = \sum_i \alpha_i^\star y_i \phi(\vx_i)$, tức
+$f(\vx) = \sum_i \alpha_i^\star y_i k(\vx_i, \vx) + b^\star$.
+Hơn nữa, với mọi $i$:
+\[
+  \alpha_i^\star = 0 \Rightarrow y_i f(\vx_i) \ge 1, \qquad
+  0 < \alpha_i^\star < C \Rightarrow y_i f(\vx_i) = 1, \qquad
+  \alpha_i^\star = C \Rightarrow y_i f(\vx_i) \le 1.
+\]
+\end{theorem}
+
+\begin{proof}
+\todo{B2: Lagrangian với $\alpha_i, \mu_i \ge 0$; điều kiện dừng;
+thay ngược để ra \eqref{eq:B2-dual}; đối ngẫu mạnh (Slater);
+bù lệch để ra 3 trường hợp KKT.}
+\end{proof}
+
+% ---------------------------------------------------------------------
+\subsection{B3. Dạng hàm mất mát hinge}\label{sec:B3}
+
+\begin{proposition}\label{prop:B3-hinge}
+Với $\lambda = 1/(Cn)$, $(\vw^\star, b^\star)$ là nghiệm của \eqref{eq:B2-primal}
+khi và chỉ khi nó là nghiệm của
+\begin{equation}\label{eq:B3-erm}
+  \min_{\vw, b} \; \frac{\lambda}{2}\norm{\vw}^2
+  + \frac{1}{n}\sum_{i=1}^n \hinge{y_i f(\vx_i)}.
+\end{equation}
+Ngoài ra, hàm $t \mapsto \hinge{t}$ lồi và $\hinge{t} \ge \ind{t \le 0}$ với mọi $t \in \R$.
+\end{proposition}
+
+\begin{proof}
+\todo{B3: tại nghiệm $\xi_i = \hinge{y_i f(\vx_i)}$; chia hàm mục tiêu cho $Cn$;
+lồi vì là max của hai hàm affine; cận trên xét 2 trường hợp $t \le 0$, $t > 0$.}
+\end{proof}
+
+% ---------------------------------------------------------------------
+\subsection{B4. Định lý biểu diễn}\label{sec:B4}
+
+\begin{theorem}[\citet{scholkopf2001generalized}]\label{thm:B4-representer}
+Cho $k$ là hàm nhân xác định dương trên $\X$ với RKHS $\Hk$, dữ liệu
+$(\vx_1, y_1), \dots, (\vx_n, y_n)$, hàm mất mát bất kỳ
+$c : (\X \times \R \times \R)^n \to \R \cup \{\infty\}$ và
+$\Omega : [0, \infty) \to \R$ tăng nghiêm ngặt. Khi đó mọi nghiệm $f^\star \in \Hk$ của
+\[
+  \min_{f \in \Hk} \; c\bigl((\vx_1, y_1, f(\vx_1)), \dots, (\vx_n, y_n, f(\vx_n))\bigr)
+  + \Omega\bigl(\Hnorm{f}\bigr)
+\]
+đều có dạng $f^\star = \sum_{i=1}^n \alpha_i k(\vx_i, \cdot)$ với $\alpha_i \in \R$.
+\end{theorem}
+
+\begin{proof}
+\todo{B4: phân tích $f = f_\parallel + f_\perp$ với $f_\parallel \in \spn\{k(\vx_i,\cdot)\}$;
+tính chất tái sinh cho $f(\vx_i) = f_\parallel(\vx_i)$; Pythagoras;
+$\Omega$ tăng nghiêm ngặt nên $f_\perp = 0$.}
+\end{proof}
+
+% ---------------------------------------------------------------------
+\subsection{B5. Tính chất đóng của hàm nhân xác định dương}\label{sec:B5}
+
+\begin{definition}\label{def:B5-pd}
+Hàm đối xứng $k : \X \times \X \to \R$ được gọi là \emph{xác định dương} nếu với mọi
+$m \in \N$, mọi $\vx_1, \dots, \vx_m \in \X$ và mọi $\vc \in \R^m$:
+$\sum_{i,j=1}^m c_i c_j k(\vx_i, \vx_j) \ge 0$, tức là mọi ma trận Gram đều nửa xác định dương.
+\end{definition}
+
+\begin{lemma}[Định lý tích Schur]\label{lem:B5-schur}
+Nếu $\mathbf{A}, \mathbf{B} \in \R^{m \times m}$ nửa xác định dương thì tích Hadamard
+$\mathbf{A} \circ \mathbf{B}$ cũng nửa xác định dương.
+\end{lemma}
+
+\begin{proof}
+\todo{Phân tích phổ $\mathbf{A} = \sum_k \lambda_k \vu_k\vu_k\T$, $\lambda_k \ge 0$.}
+\end{proof}
+
+\begin{proposition}\label{prop:B5-closure}
+Cho $k_1, k_2$ là các hàm nhân xác định dương trên $\X$. Khi đó các hàm sau cũng
+xác định dương: (i) $k_1 + k_2$; (ii) $c\,k_1$ với $c \ge 0$; (iii) $k_1 k_2$;
+(iv) $k = \lim_{m\to\infty} k_m$ nếu mỗi $k_m$ xác định dương và giới hạn tồn tại tại mọi điểm;
+(v) $\exp(k_1)$.
+\end{proposition}
+
+\begin{proof}
+\todo{(i)(ii) trực tiếp; (iii) Bổ đề~\ref{lem:B5-schur}; (iv) bất đẳng thức không ngặt
+bảo toàn qua giới hạn; (v) chuỗi Taylor + (i)--(iv).}
+\end{proof}
+
+\begin{corollary}\label{cor:B5-gauss}
+Với mọi $\gamma > 0$, hàm nhân Gauss $k(\vx, \vz) = \exp(-\gamma\norm{\vx - \vz}^2)$ xác định dương.
+\end{corollary}
+
+\begin{proof}
+\todo{Viết $k(\vx,\vz) = g(\vx)\,g(\vz)\exp(2\gamma\vx\T\vz)$ với $g(\vx) = \exp(-\gamma\norm{\vx}^2)$.}
+\end{proof}
+
+% ---------------------------------------------------------------------
+\subsection{B6. Cận sai số kiểm định chéo bỏ-một}\label{sec:B6}
+
+\begin{theorem}[\citet{vapnik1995nature}]\label{thm:B6-loo}
+Giả sử dữ liệu khả tách và $\valpha$ là nghiệm đối ngẫu của SVM lề cứng huấn luyện trên
+cả $n$ mẫu. Gọi $f^{(-i)}$ là SVM lề cứng huấn luyện khi bỏ mẫu $i$. Khi đó
+\[
+  \frac{1}{n}\sum_{i=1}^n \ind{y_i f^{(-i)}(\vx_i) \le 0}
+  \;\le\; \frac{\abs{\{i : \alpha_i > 0\}}}{n}.
+\]
+\end{theorem}
+
+\begin{proof}
+\todo{B6: bỏ mẫu có $\alpha_i = 0$ thì nghiệm cũ vẫn thỏa KKT trên tập còn lại;
+dùng tính duy nhất của $\vw^\star$; mẫu đó có $y_i f(\vx_i) \ge 1$ nên không gây lỗi.}
+\end{proof}

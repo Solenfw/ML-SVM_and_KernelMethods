@@ -1,0 +1,24 @@
+% =====================================================================
+%  Phần D: Ứng dụng phân loại giống gạo Việt Nam từ ảnh hạt (P3)
+% =====================================================================
+\section{Ứng dụng: phân loại giống gạo Việt Nam từ ảnh hạt}\label{sec:app}
+\owner{P3}
+
+\subsection{D1. Thiết kế thu thập dữ liệu}\label{sec:D1}
+\todo{Các giống gạo và nguồn gốc; quy trình chụp (giá cố định, nền, ánh sáng, thước);
+số hạt mỗi giống, số phiên, số thiết bị; ảnh bộ setup.}
+
+\subsection{D2. Xử lý ảnh}\label{sec:D2}
+\todo{Phân ngưỡng Otsu \citep{otsu1979threshold}; hình thái học; watershed
+\citep{vincent1991watersheds}; gán nhãn thành phần liên thông; loại hạt gãy; tỉ lệ tách đúng.}
+
+\subsection{D3. Trích chọn đặc trưng}\label{sec:D3}
+\todo{Hình thái, màu sắc (RGB, HSV, CIELAB), kết cấu GLCM \citep{haralick1973textural}; EDA.}
+
+\subsection{D4. Mô hình hóa}\label{sec:D4}
+\todo{SVM (Mục~\ref{sec:impl}) với 3 hàm nhân, k-NN, hồi quy logistic;
+chuẩn hóa đặc trưng; kiểm định chéo lồng nhau theo phiên chụp.}
+
+\subsection{D5. Đánh giá}\label{sec:D5}
+\todo{Chia theo phiên; ma trận nhầm lẫn; độ bền khi đổi thiết bị; ablation;
+thảo luận ứng dụng kiểm tra nhãn gạo đặc sản.}

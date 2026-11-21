@@ -1,0 +1,24 @@
+% =====================================================================
+%  Phần A: Phát triển phương pháp và cài đặt (P2)
+%  Công thức SMO: xem notes/kkt_cheatsheet.md. Dẫn chiếu lý thuyết:
+%  Định lý~\ref{thm:B2-dual} (đối ngẫu + KKT).
+% =====================================================================
+\section{Cài đặt thuật toán}\label{sec:impl}
+\owner{P2}
+
+\subsection{A1. Thuật toán SMO}\label{sec:A1}
+\todo{Bài toán đối ngẫu (dẫn Định lý~\ref{thm:B2-dual}); chọn cặp vi phạm KKT lớn nhất
+\citep{keerthi2001improvements}; cập nhật giải tích 2 biến \citep{platt1998smo};
+cập nhật gradient; tính $b$; 3 hàm nhân; pseudo-code; hình hội tụ.}
+
+\subsection{A2. Hạ tọa độ đối ngẫu và hồi quy Ridge hàm nhân}\label{sec:A2}
+\todo{DCD cho SVM tuyến tính \citep{hsieh2008dual}; kernel ridge regression với
+nghiệm dạng đóng $\valpha = (\mK + \lambda\mI)^{-1}\vy$.}
+
+\subsection{A3. Mở rộng đa lớp và Platt scaling}\label{sec:A3}
+\todo{Một-đấu-một, một-đấu-phần còn lại; Platt scaling \citep{platt1999probabilistic, lin2007note};
+pairwise coupling \citep{wu2004probability}; reliability diagram, Brier score.}
+
+\subsection{A4. Đối chiếu với LIBSVM}\label{sec:A4}
+\todo{Bảng so sánh với LIBSVM \citep{chang2011libsvm} qua scikit-learn \citep{pedregosa2011scikit}:
+hàm mục tiêu đối ngẫu, tập vector hỗ trợ, $b$, dự đoán; nêu ngưỡng sai số cho phép.}

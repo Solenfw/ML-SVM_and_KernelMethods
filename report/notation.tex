@@ -1,0 +1,53 @@
+% =====================================================================
+%  Ký hiệu dùng chung cho cả báo cáo (P1 quản lý).
+%  Quy ước: vector chữ thường in đậm, ma trận chữ hoa in đậm,
+%  vô hướng chữ thường nghiêng. Muốn thêm macro → báo P1, đừng tự định nghĩa
+%  trong file section để tránh trùng tên.
+% =====================================================================
+
+% ---- Tập số, không gian ----
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\X}{\mathcal{X}}               % không gian đầu vào
+\newcommand{\Hk}{\mathcal{H}_k}            % RKHS của hàm nhân k
+
+% ---- Vector, ma trận ----
+\newcommand{\vect}[1]{\bm{#1}}
+\newcommand{\vw}{\vect{w}}
+\newcommand{\vx}{\vect{x}}
+\newcommand{\vz}{\vect{z}}
+\newcommand{\vy}{\vect{y}}
+\newcommand{\vu}{\vect{u}}
+\newcommand{\vc}{\vect{c}}
+\newcommand{\valpha}{\vect{\alpha}}
+\newcommand{\vxi}{\vect{\xi}}
+\newcommand{\vmu}{\vect{\mu}}
+\newcommand{\ve}{\vect{e}}                 % vector toàn số 1
+\newcommand{\vzero}{\vect{0}}
+\newcommand{\mK}{\mathbf{K}}               % ma trận Gram, K_ij = k(x_i, x_j)
+\newcommand{\mQ}{\mathbf{Q}}               % Q_ij = y_i y_j K_ij
+\newcommand{\mI}{\mathbf{I}}
+\newcommand{\T}{^{\top}}                   % chuyển vị: \vw\T\vx
+
+% ---- Chuẩn, tích vô hướng ----
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\inner}[2]{\left\langle #1, #2 \right\rangle}
+\newcommand{\Hnorm}[1]{\norm{#1}_{\Hk}}
+\newcommand{\Hinner}[2]{\inner{#1}{#2}_{\Hk}}
+
+% ---- Toán tử ----
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\spn}{span}
+\newcommand{\ind}[1]{\mathbf{1}\!\left[#1\right]}   % hàm chỉ thị
+\newcommand{\hinge}[1]{\max\{0,\, 1 - #1\}}         % mất mát hinge
+
+% ---- SVM, SMO ----
+\newcommand{\Iup}{I_{\mathrm{up}}}
+\newcommand{\Ilow}{I_{\mathrm{low}}}
+\newcommand{\SV}{\mathcal{S}}               % tập chỉ số vector hỗ trợ {i : α_i > 0}
+\newcommand{\Dual}{D}                       % hàm mục tiêu đối ngẫu (dạng max)
+\newcommand{\nsv}{n_{\mathrm{SV}}}          % số vector hỗ trợ

@@ -1,0 +1,46 @@
+% =====================================================================
+%  Giới thiệu + bảng ký hiệu (P1)
+% =====================================================================
+\section{Giới thiệu}\label{sec:intro}
+
+\todo{Viết 2--3 đoạn: bài toán lề cực đại, vì sao chọn SVM cho dữ liệu cỡ nhỏ
+và đặc trưng thiết kế thủ công, mục tiêu và đóng góp của báo cáo.}
+
+Máy vector hỗ trợ (SVM) lề mềm được đề xuất bởi \citet{cortes1995support}.
+Báo cáo cài đặt thuật toán SMO \citep{platt1998smo}, hiệu chỉnh xác suất đầu ra
+theo \citet{platt1999probabilistic}, và trình bày cơ sở lý thuyết của phương pháp
+hàm nhân theo \citet{scholkopf2001generalized, scholkopf2002learning}.
+
+\paragraph{Cấu trúc báo cáo.}
+Mục~\ref{sec:theory} trình bày các chứng minh lý thuyết (Phần B).
+Mục~\ref{sec:impl} mô tả cài đặt thuật toán và đối chiếu với LIBSVM (Phần A).
+Mục~\ref{sec:exercises} giải các bài tập và thực nghiệm (Phần C).
+Mục~\ref{sec:app} trình bày ứng dụng phân loại giống gạo Việt Nam (Phần D).
+
+\subsection{Ký hiệu}\label{sec:notation}
+
+\begin{table}[H]
+\centering
+\caption{Ký hiệu dùng trong báo cáo}\label{tab:notation}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Ký hiệu & Ý nghĩa \\
+\midrule
+$n$, $d$ & số mẫu huấn luyện, số chiều đặc trưng \\
+$\vx_i \in \R^d$, $y_i \in \{-1, +1\}$ & mẫu thứ $i$ và nhãn của nó \\
+$\vw$, $b$ & vector pháp tuyến và hệ số chặn của siêu phẳng \\
+$f(\vx) = \vw\T\vx + b$ & hàm quyết định; dự đoán $\sign f(\vx)$ \\
+$\xi_i \ge 0$ & biến bù (slack) của mẫu $i$ trong SVM lề mềm \\
+$C > 0$ & tham số phạt của SVM lề mềm \\
+$\lambda > 0$ & hệ số chính quy hóa, $C = 1/(\lambda n)$ \\
+$\valpha \in \R^n$ & nhân tử Lagrange (biến đối ngẫu) \\
+$k(\vx, \vz)$ & hàm nhân xác định dương \\
+$\mK$, $K_{ij} = k(\vx_i, \vx_j)$ & ma trận Gram \\
+$\mQ$, $Q_{ij} = y_i y_j K_{ij}$ & ma trận của bài toán đối ngẫu \\
+$\Hk$, $\Hnorm{\cdot}$ & RKHS sinh bởi $k$ và chuẩn trên đó \\
+$\gamma$ & tham số độ rộng của hàm nhân Gauss $\exp(-\gamma\norm{\vx - \vz}^2)$ \\
+$\SV = \{i : \alpha_i > 0\}$, $\nsv = \abs{\SV}$ & tập và số vector hỗ trợ \\
+$\Iup$, $\Ilow$ & tập chỉ số dùng trong điều kiện KKT của SMO \\
+\bottomrule
+\end{tabular}
+\end{table}

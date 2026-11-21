@@ -1,0 +1,93 @@
+% =====================================================================
+%  Đề tài 4: Máy vector hỗ trợ và phương pháp hàm nhân
+%  Biên dịch bằng XeLaTeX (xem report/README.md). Trên Overleaf:
+%  Menu → Compiler → XeLaTeX.
+%  File này do P1 quản lý. Mỗi người chỉ sửa file trong sections/ của mình.
+% =====================================================================
+\documentclass[12pt,a4paper]{article}
+
+% ---------- Ngôn ngữ và font ----------
+\usepackage{fontspec}
+\usepackage{babel}
+\babelprovide[import, main]{vietnamese}
+
+% ---------- Trang ----------
+\usepackage[margin=2.5cm]{geometry}
+\linespread{1.15}
+
+% ---------- Toán ----------
+\usepackage{amsmath, amssymb, amsthm, mathtools, bm}
+
+% ---------- Hình, bảng, code ----------
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\small, breaklines=true, frame=single, columns=fullflexible}
+
+% Pseudo-code: cần gói algorithms + algorithmicx (không có trong TeX Live basic).
+% Cài: sudo tlmgr install algorithms algorithmicx   (Overleaf có sẵn).
+\IfFileExists{algpseudocode.sty}{%
+  \usepackage{algorithm}
+  \usepackage{algpseudocode}
+  \floatname{algorithm}{Thuật toán}
+}{%
+  \typeout{*** Thiếu algpseudocode.sty: chưa dùng được môi trường algorithm ***}
+}
+
+% ---------- Tài liệu tham khảo ----------
+\usepackage[numbers, sort&compress]{natbib}
+\renewcommand{\bibsection}{\section*{Tài liệu tham khảo}\addcontentsline{toc}{section}{Tài liệu tham khảo}}
+
+% ---------- Liên kết (để gần cuối) ----------
+\usepackage[colorlinks=true, linkcolor=blue!60!black, citecolor=green!40!black, urlcolor=blue!60!black]{hyperref}
+
+% ---------- Định lý ----------
+\theoremstyle{plain}
+\newtheorem{theorem}{Định lý}[section]
+\newtheorem{lemma}[theorem]{Bổ đề}
+\newtheorem{proposition}[theorem]{Mệnh đề}
+\newtheorem{corollary}[theorem]{Hệ quả}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Định nghĩa}
+\newtheorem{example}[theorem]{Ví dụ}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Nhận xét}
+
+% ---------- Ký hiệu dùng chung ----------
+\input{notation}
+
+% ---------- Theo dõi tiến độ ----------
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO:} #1\textbf{]}}}
+\newcommand{\owner}[1]{\marginpar{\footnotesize\textcolor{gray}{#1}}}
+
+% =====================================================================
+\title{\textbf{Đề tài 4: Máy vector hỗ trợ và phương pháp hàm nhân}\\[4pt]
+       \large Bài tập lớn môn Học máy}
+\author{%
+  \todo{Họ tên P1} \and \todo{Họ tên P2} \and \todo{Họ tên P3}\\[6pt]
+  \small Giảng viên hướng dẫn: TS. Phạm Văn Khánh}
+\date{Tháng 12 năm 2026}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\input{sections/00_intro}         % P1
+\input{sections/B_theory}         % P1
+\input{sections/A_implementation} % P2
+\input{sections/C_exercises}      % P1 (C1–C4), P2 (C5)
+\input{sections/D_application}    % P3
+\input{sections/99_conclusion}    % P1
+
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+\appendix
+\input{sections/Z_contributions}  % P1
+\end{document}
