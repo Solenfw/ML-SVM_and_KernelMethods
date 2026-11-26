@@ -3,19 +3,46 @@
 % =====================================================================
 \section{Giới thiệu}\label{sec:intro}
 
-\todo{Viết 2--3 đoạn: bài toán lề cực đại, vì sao chọn SVM cho dữ liệu cỡ nhỏ
-và đặc trưng thiết kế thủ công, mục tiêu và đóng góp của báo cáo.}
+Trong bài toán phân loại nhị phân, khi hai lớp tách được bằng một siêu phẳng thì thường có vô số
+siêu phẳng như vậy. Máy vector hỗ trợ (SVM) chọn siêu phẳng có \emph{lề} lớn nhất, tức là cách xa
+nhất các điểm gần nó của cả hai lớp; phiên bản lề mềm cho phép một số mẫu vi phạm lề với chi phí
+điều khiển bởi tham số $C$ \citep{cortes1995support}. Hai tính chất làm nên sức mạnh của SVM.
+Thứ nhất, bài toán huấn luyện là quy hoạch toàn phương lồi, nên mọi cực tiểu địa phương đều là cực
+tiểu toàn cục và kết quả không phụ thuộc vào khởi tạo hay thứ tự duyệt mẫu. Thứ hai, bài toán đối ngẫu chỉ truy
+cập dữ liệu qua tích vô hướng; thay tích vô hướng bằng một hàm nhân xác định dương cho phép học biên
+quyết định phi tuyến trong một không gian đặc trưng, có thể vô hạn chiều, mà không cần tính ánh xạ
+đặc trưng một cách tường minh \citep{scholkopf2002learning}. Nghiệm cuối cùng chỉ phụ thuộc vào một
+phần nhỏ các mẫu, gọi là \emph{vector hỗ trợ}.
 
-Máy vector hỗ trợ (SVM) lề mềm được đề xuất bởi \citet{cortes1995support}.
-Báo cáo cài đặt thuật toán SMO \citep{platt1998smo}, hiệu chỉnh xác suất đầu ra
-theo \citet{platt1999probabilistic}, và trình bày cơ sở lý thuyết của phương pháp
-hàm nhân theo \citet{scholkopf2001generalized, scholkopf2002learning}.
+Những tính chất này khiến SVM đặc biệt phù hợp với bài toán có \emph{dữ liệu cỡ nhỏ} (vài trăm đến
+vài nghìn mẫu) và \emph{đặc trưng thiết kế thủ công} (vài chục chiều). Đây đúng là bối cảnh của ứng
+dụng trong báo cáo: phân loại giống gạo Việt Nam từ đặc trưng hình thái, màu sắc và kết cấu của
+từng hạt, với mục đích hỗ trợ kiểm tra tính xác thực của nhãn các giống gạo đặc sản. Ở quy mô này,
+các mô hình nhiều tham số thường cần lượng dữ liệu lớn hơn nhiều so với mức có thể thu thập thủ
+công. Ngược lại, SVM chỉ có hai siêu tham số chính ($C$ và tham số của hàm nhân) chọn được bằng
+kiểm định chéo, và có các kết quả lý thuyết liên hệ độ thưa của nghiệm với sai số tổng quát hóa
+(Mục~\ref{sec:B6}).
 
-\paragraph{Cấu trúc báo cáo.}
-Mục~\ref{sec:theory} trình bày các chứng minh lý thuyết (Phần B).
-Mục~\ref{sec:impl} mô tả cài đặt thuật toán và đối chiếu với LIBSVM (Phần A).
-Mục~\ref{sec:exercises} giải các bài tập và thực nghiệm (Phần C).
-Mục~\ref{sec:app} trình bày ứng dụng phân loại giống gạo Việt Nam (Phần D).
+Mục tiêu của báo cáo là đi trọn từ lý thuyết, qua cài đặt, tới ứng dụng:
+\begin{itemize}
+  \item \textbf{Lý thuyết} (Mục~\ref{sec:theory}): chứng minh đầy đủ các kết quả nền tảng, gồm hình
+        học của lề cực đại, bài toán đối ngẫu và điều kiện KKT của SVM lề mềm, sự tương đương với
+        cực tiểu hóa mất mát hinge, định lý biểu diễn \citep{scholkopf2001generalized}, tính chất đóng
+        của hàm nhân xác định dương, và cận sai số bỏ-một theo số vector hỗ trợ.
+  \item \textbf{Cài đặt} (Mục~\ref{sec:impl}): cài đặt từ đầu thuật toán SMO \citep{platt1998smo}
+        với chiến lược chọn cặp vi phạm KKT lớn nhất, hạ tọa độ đối ngẫu cho SVM tuyến tính
+        \citep{hsieh2008dual}, hồi quy Ridge hàm nhân, mở rộng đa lớp và Platt scaling
+        \citep{platt1999probabilistic}; đối chiếu kết quả với LIBSVM \citep{chang2011libsvm}.
+  \item \textbf{Bài tập và thực nghiệm} (Mục~\ref{sec:exercises}): giải tay các ví dụ nhỏ, khảo sát
+        ảnh hưởng của $C$ và $\gamma$ bằng kiểm định chéo lồng nhau, kiểm chứng thực nghiệm cận sai số
+        bỏ-một, và so sánh thời gian huấn luyện của SMO với hạ tọa độ đối ngẫu.
+  \item \textbf{Ứng dụng} (Mục~\ref{sec:app}): thu thập ảnh hạt gạo có kiểm soát, xử lý ảnh, trích
+        chọn đặc trưng, so sánh SVM với k-NN và hồi quy logistic, đánh giá theo phiên chụp để tránh
+        rò rỉ dữ liệu giữa tập huấn luyện và tập kiểm tra.
+\end{itemize}
+Mục~\ref{sec:conclusion} tóm tắt kết quả và hướng phát triển; Phụ lục~\ref{sec:contrib} trình bày
+phân công công việc. Mã nguồn (thư viện \texttt{svmlib/}) và các script tái lập thí nghiệm
+(\texttt{experiments/}) nằm trong kho mã của nhóm.
 
 \subsection{Ký hiệu}\label{sec:notation}
 
