@@ -9,7 +9,69 @@
 \textbf{Đề bài.} Lớp dương gồm $(2, 0)$ và $(0, 2)$, lớp âm gồm $(0, 0)$. Giải tay SVM lề cứng:
 xác định $\vw$, $b$, độ rộng lề, các nhân tử Lagrange và kiểm tra toàn bộ điều kiện KKT.
 
-\todo{C1: lời giải; đối chiếu với SMO của P2.}
+\textbf{Lời giải.} Đặt $\vx_1 = (2, 0)$, $\vx_2 = (0, 2)$ với $y_1 = y_2 = +1$ và $\vx_3 = (0, 0)$ với
+$y_3 = -1$. Bài toán lề cứng \eqref{eq:B1-hardmargin} là
+\[
+  \min_{\vw, b} \tfrac12(w_1^2 + w_2^2) \quad\text{với}\quad
+  2w_1 + b \ge 1, \quad 2w_2 + b \ge 1, \quad -b \ge 1 .
+\]
+
+\emph{Giải trực tiếp bài toán gốc.} Ràng buộc thứ ba cho $b \le -1$, nên hai ràng buộc đầu cho
+$w_1 \ge (1 - b)/2 \ge 1$ và $w_2 \ge 1$. Do đó $\frac12\norm{\vw}^2 \ge \frac12(1 + 1) = 1$,
+dấu bằng khi và chỉ khi $w_1 = w_2 = 1$ và $b = -1$. Vậy nghiệm duy nhất là
+\[
+  \vw^\star = (1, 1), \qquad b^\star = -1, \qquad f(\vx) = x_1 + x_2 - 1 .
+\]
+Siêu phẳng tách là đường thẳng $x_1 + x_2 = 1$, nằm chính giữa gốc tọa độ và đoạn nối hai điểm dương.
+
+\emph{Độ rộng lề.} Khoảng cách từ mỗi điểm tới siêu phẳng là
+$\abs{f(\vx_i)}/\norm{\vw^\star} = 1/\sqrt2$ (Mệnh đề~\ref{prop:B1-distance}), nên lề hình học bằng
+$1/\norm{\vw^\star} = 1/\sqrt2 \approx 0{,}707$ và độ rộng cả dải lề (giữa hai đường $f = \pm 1$) là
+$2/\norm{\vw^\star} = \sqrt2 \approx 1{,}414$.
+
+\emph{Nhân tử Lagrange qua bài toán đối ngẫu.} Với hàm nhân tuyến tính,
+$\sum_i \alpha_i y_i \vx_i = (2\alpha_1, 2\alpha_2)$ (vì $\vx_3 = \vzero$), và ràng buộc
+$\sum_i \alpha_i y_i = 0$ cho $\alpha_3 = \alpha_1 + \alpha_2$. Bài toán đối ngẫu \eqref{eq:B2-dual}
+(không có cận trên $C$) trở thành
+\[
+  \max_{\alpha_1, \alpha_2 \ge 0} \; \Dual = \alpha_1 + \alpha_2 + \alpha_3 - \tfrac12\norm{(2\alpha_1, 2\alpha_2)}^2
+  = 2(\alpha_1 + \alpha_2) - 2\alpha_1^2 - 2\alpha_2^2 .
+\]
+Hàm này lõm, đạo hàm riêng $2 - 4\alpha_1 = 0$ và $2 - 4\alpha_2 = 0$ cho $\alpha_1 = \alpha_2 = \frac12$,
+thỏa $\alpha \ge 0$, nên đây là cực đại toàn cục. Suy ra
+\[
+  \valpha^\star = \bigl(\tfrac12, \tfrac12, 1\bigr), \qquad \Dual(\valpha^\star) = 1 .
+\]
+Từ nhân tử khôi phục được $\vw^\star = \sum_i \alpha_i y_i \vx_i = (1, 1)$, và từ vector hỗ trợ
+$\vx_3$: $y_3(\vw^{\star\top}\vx_3 + b) = 1 \Rightarrow b^\star = -1$, khớp với lời giải trực tiếp.
+Cả ba điểm có $\alpha_i > 0$ nên đều là vector hỗ trợ.
+
+\emph{Kiểm tra toàn bộ điều kiện KKT.}
+\begin{table}[H]
+\centering
+\caption{Kiểm tra điều kiện KKT cho bài C1 ($f(\vx) = x_1 + x_2 - 1$)}\label{tab:C1-kkt}
+\begin{tabular}{@{}cccccc@{}}
+\toprule
+$i$ & $\vx_i$ & $y_i$ & $\alpha_i^\star$ & $y_i f(\vx_i)$ & $\alpha_i^\star\bigl(y_i f(\vx_i) - 1\bigr)$ \\
+\midrule
+1 & $(2, 0)$ & $+1$ & $1/2$ & $1$ & $0$ \\
+2 & $(0, 2)$ & $+1$ & $1/2$ & $1$ & $0$ \\
+3 & $(0, 0)$ & $-1$ & $1$   & $1$ & $0$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{itemize}
+  \item Khả thi gốc: $y_i f(\vx_i) = 1 \ge 1$ với mọi $i$ (cả ba điểm nằm đúng trên lề).
+  \item Khả thi đối ngẫu: $\alpha_i^\star \ge 0$.
+  \item Điều kiện dừng: $\sum_i \alpha_i^\star y_i \vx_i = \frac12(2, 0) + \frac12(0, 2) - 1\cdot(0, 0) = (1, 1) = \vw^\star$
+        và $\sum_i \alpha_i^\star y_i = \frac12 + \frac12 - 1 = 0$.
+  \item Bù lệch: cột cuối của Bảng~\ref{tab:C1-kkt} bằng $0$.
+  \item Khe đối ngẫu bằng $0$: $\frac12\norm{\vw^\star}^2 = 1 = \Dual(\valpha^\star)$.
+\end{itemize}
+
+\emph{Đối chiếu bằng số.} Chạy \texttt{svmlib.SVC} (SMO của Mục~\ref{sec:impl}) với hàm nhân tuyến tính
+và $C = 10^6$ (xấp xỉ lề cứng) cho đúng $\valpha = (0{,}5;\, 0{,}5;\, 1)$, $\vw = (1, 1)$, $b = -1$,
+$\Dual = 1$; LIBSVM cho cùng kết quả (script \texttt{experiments/c1\_c3\_check.py}).
 
 % ---------------------------------------------------------------------
 \subsection{C2. Bài toán XOR và ánh xạ đặc trưng}\label{sec:C2}
@@ -18,7 +80,54 @@ xác định $\vw$, $b$, độ rộng lề, các nhân tử Lagrange và kiểm 
 đặc trưng tường minh $\phi$ với $\phi(\vx)\T\phi(\vz) = (\vx\T\vz + 1)^2$ và một siêu phẳng tách
 trong không gian đặc trưng.
 
-\todo{C2: lời giải.}
+\textbf{Lời giải.} Mã hóa hai giá trị logic $\{0, 1\}$ thành $\{-1, +1\}$. Bốn điểm XOR là
+\[
+  \vx_1 = (1, 1),\; \vx_2 = (-1, -1) \text{ với } y = -1; \qquad
+  \vx_3 = (1, -1),\; \vx_4 = (-1, 1) \text{ với } y = +1,
+\]
+tức là $y = -x_1 x_2$ (hai tọa độ khác nhau thì XOR bằng $1$). Phép mã hóa $t \mapsto 2t - 1$ là song
+ánh affine, mà ảnh của một siêu phẳng qua song ánh affine vẫn là siêu phẳng, nên kết luận về tính khả
+tách không phụ thuộc vào cách mã hóa.
+
+\emph{XOR không khả tách tuyến tính.} Giả sử có $(\vw, b)$ với $y_i(\vw\T\vx_i + b) > 0$ cho cả bốn điểm.
+Cộng hai bất đẳng thức của lớp dương:
+$(w_1 - w_2 + b) + (-w_1 + w_2 + b) = 2b > 0$. Cộng hai bất đẳng thức của lớp âm:
+$-(w_1 + w_2 + b) - (-w_1 - w_2 + b) = -2b > 0$. Hai kết quả mâu thuẫn, nên không tồn tại siêu phẳng tách.
+Về hình học: trung điểm của hai điểm dương và trung điểm của hai điểm âm trùng nhau (đều là gốc
+tọa độ), nên bao lồi của hai lớp giao nhau.
+
+\emph{Ánh xạ đặc trưng tường minh.} Khai triển
+\[
+  (\vx\T\vz + 1)^2 = (x_1 z_1 + x_2 z_2 + 1)^2
+  = x_1^2 z_1^2 + x_2^2 z_2^2 + 2x_1x_2 z_1z_2 + 2x_1z_1 + 2x_2z_2 + 1 .
+\]
+Mỗi số hạng là tích của một hàm của $\vx$ với cùng hàm đó của $\vz$, nên với
+\[
+  \phi(\vx) = \bigl(x_1^2,\; x_2^2,\; \sqrt2\,x_1x_2,\; \sqrt2\,x_1,\; \sqrt2\,x_2,\; 1\bigr) \in \R^6
+\]
+ta có $\phi(\vx)\T\phi(\vz) = (\vx\T\vz + 1)^2$.
+
+\emph{Siêu phẳng tách trong không gian đặc trưng.} Tọa độ thứ ba của $\phi$ là $\sqrt2\,x_1x_2 = -\sqrt2\,y$
+trên dữ liệu. Chọn
+\[
+  \vect{v} = \bigl(0, 0, -\tfrac{1}{\sqrt2}, 0, 0, 0\bigr), \qquad c = 0
+  \quad\Longrightarrow\quad \vect{v}\T\phi(\vx) + c = -x_1x_2 .
+\]
+Khi đó $y_i(\vect{v}\T\phi(\vx_i) + c) = y_i^2 = 1 > 0$ với cả bốn điểm, nên siêu phẳng
+$\{\vect{u} \in \R^6 : \vect{v}\T\vect{u} = 0\}$ tách đúng dữ liệu.
+
+\emph{Đây chính là siêu phẳng lề cực đại.} Với $k(\vx, \vz) = (\vx\T\vz + 1)^2$, ma trận Gram của bốn
+điểm là $\mK = 8\mI + \ve\ve\T$ (đường chéo bằng $(2 + 1)^2 = 9$, các phần tử khác bằng $1$). Do
+đối xứng, thử $\alpha_i = a$ với mọi $i$: vì $\sum_i y_i = 0$,
+$\mQ = (\vy\vy\T) \circ \mK = 8\mI + \vy\vy\T$ và $\valpha\T\mQ\valpha = a^2(32 + (\ve\T\vy)^2) = 32a^2$,
+nên $\Dual = 4a - 16a^2$, cực đại tại $a = \frac18$. Điểm này là nghiệm thật của bài toán đối ngẫu,
+không chỉ tốt nhất trong các điểm đối xứng: gradient $\ve - \mQ\valpha = (1 - 8a)\ve = \vzero$ tại
+$a = \frac18$, ràng buộc $\sum_i \alpha_i y_i = 0$ thỏa mãn, và $\Dual$ lõm. Khi đó
+$\vw = \sum_i \alpha_i y_i \phi(\vx_i) = \bigl(0, 0, -\tfrac{1}{\sqrt2}, 0, 0, 0\bigr) = \vect{v}$
+và $b = 0$ (mọi điểm là vector hỗ trợ với $y_i f(\vx_i) = 1$). Hàm quyết định trong không gian gốc là
+$f(\vx) = -x_1x_2$: biên quyết định là hai trục tọa độ, độ rộng lề trong không gian đặc trưng là
+$2/\norm{\vw} = 2\sqrt2$. Kết quả này cũng được SMO của Mục~\ref{sec:impl} tìm lại bằng số
+(\texttt{experiments/c1\_c3\_check.py}).
 
 % ---------------------------------------------------------------------
 \subsection{C3. Một hàm không phải hàm nhân xác định dương}\label{sec:C3}
@@ -26,13 +135,169 @@ trong không gian đặc trưng.
 \textbf{Đề bài.} Chứng minh $k(\vx, \vz) = \norm{\vx - \vz}$ không là hàm nhân xác định dương
 bằng một phản ví dụ.
 
-\todo{C3: lời giải.}
+\textbf{Lời giải.} Theo Định nghĩa~\ref{def:B5-pd}, chỉ cần một bộ điểm và một vector hệ số làm
+dạng toàn phương âm. Lấy hai điểm phân biệt bất kỳ $\vx_1 \ne \vx_2$ và đặt $d = \norm{\vx_1 - \vx_2} > 0$.
+Ma trận Gram là
+\[
+  \mK = \begin{pmatrix} k(\vx_1, \vx_1) & k(\vx_1, \vx_2) \\ k(\vx_2, \vx_1) & k(\vx_2, \vx_2) \end{pmatrix}
+      = \begin{pmatrix} 0 & d \\ d & 0 \end{pmatrix}.
+\]
+Với $\vc = (1, -1)$: $\vc\T\mK\vc = 0 - d - d + 0 = -2d < 0$. Vậy $k$ không xác định dương.
+Ví dụ cụ thể: $\vx_1 = 0$, $\vx_2 = 1$ trên $\R$ cho $\mK = \bigl(\begin{smallmatrix} 0 & 1 \\ 1 & 0\end{smallmatrix}\bigr)$
+có trị riêng $\pm 1$ và $\vc\T\mK\vc = -2$.
+
+\begin{remark}
+Có một cách nhận ra nhanh: mọi hàm nhân xác định dương đều thỏa bất đẳng thức Cauchy--Schwarz
+$k(\vx, \vz)^2 \le k(\vx, \vx)\,k(\vz, \vz)$ (vì ma trận Gram $2 \times 2$ có định thức không âm).
+Ở đây vế phải bằng $0$ còn vế trái bằng $d^2 > 0$. Ngược lại, $\exp(-\gamma\norm{\vx - \vz})$
+(hàm nhân Laplace) lại xác định dương; dấu trừ và hàm mũ là then chốt.
+\end{remark}
 
 % ---------------------------------------------------------------------
 \subsection{\texorpdfstring{C4. Ảnh hưởng của $C$ và $\gamma$}{C4. Ảnh hưởng của C và γ}}\label{sec:C4}
 \owner{P1}
-\todo{C4: thiết lập thí nghiệm; heatmap sai số kiểm định chéo lồng nhau;
-số vector hỗ trợ và độ rộng lề theo $C$, $\gamma$; đối chiếu với cận ở Định lý~\ref{thm:B6-loo}.}
+\paragraph{Thiết lập.} Mọi mô hình là SVM hàm nhân Gauss huấn luyện bằng SMO của Mục~\ref{sec:impl}
+(\texttt{svmlib.SVC}, $\mathrm{tol} = 10^{-3}$), trên hai bộ dữ liệu:
+\emph{moons} ($n = 200$, $d = 2$, nhiễu $0{,}25$, hai lớp cân bằng) và
+\emph{breast cancer} ($n = 569$, $d = 30$, $37{,}3\%$ mẫu ác tính). Đặc trưng được chuẩn hóa về
+trung bình $0$, phương sai $1$. Lưới gồm $C \in \{10^{-2}, \dots, 10^{3}\}$ và
+$\gamma \in \{10^{-3}, \dots, 10\}$ (6 × 5 = 30 cấu hình). Với mỗi cấu hình ta đo:
+\begin{itemize}
+  \item trên toàn bộ dữ liệu: số vector hỗ trợ $\nsv$ (tách thành bị chặn $\alpha_i = C$ và tự do
+        $0 < \alpha_i < C$), độ rộng lề $2/\norm{\vw}$ với $\norm{\vw}^2 = \valpha\T\mQ\valpha$,
+        sai số huấn luyện;
+  \item sai số kiểm định chéo 5-fold (bộ chuẩn hóa nằm trong pipeline, fit lại ở mỗi fold);
+  \item sai số bỏ-một (LOO, $n$ lần huấn luyện) để đối chiếu với cận $\nsv/n$ của Định lý~\ref{thm:B6-loo}.
+\end{itemize}
+\emph{Kiểm định chéo lồng nhau}: vòng ngoài 5-fold dùng để ước lượng sai số kiểm tra; trong mỗi
+fold ngoài, vòng trong 5-fold tìm $(C, \gamma)$ tốt nhất trên phần huấn luyện. Như vậy dữ liệu dùng
+để chọn siêu tham số không bao giờ được dùng để chấm điểm. Ngoài ra, hai trường hợp lề cứng
+($C = 10^6$, không $\alpha_i$ nào chạm $C$, sai số huấn luyện $0$) đúng giả thiết của
+Định lý~\ref{thm:B6-loo}: dữ liệu \emph{blobs} khả tách tuyến tính ($n = 100$, hàm nhân tuyến tính)
+và moons với hàm nhân Gauss $\gamma = 3$. Toàn bộ thí nghiệm (khoảng $2{,}5 \times 10^4$ lần huấn
+luyện, khoảng 5 phút khi chạy song song) nằm trong \texttt{experiments/c4\_C\_gamma.py}; kết quả chi tiết ở
+\texttt{experiments/c4\_grid\_results.csv}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{C4_heatmap.pdf}
+\caption{Sai số kiểm định chéo vòng trong (\%), trung bình trên 5 fold ngoài. Ô viền đậm là cấu
+hình có sai số trung bình nhỏ nhất. Dòng thứ hai của tiêu đề là sai số kiểm tra của cả quy trình
+lồng nhau (trung bình $\pm$ độ lệch chuẩn trên 5 fold ngoài).}
+\label{fig:C4-heatmap}
+\end{figure}
+
+\paragraph{Kiểm định chéo lồng nhau (Hình~\ref{fig:C4-heatmap}).} Sai số kiểm tra ước lượng là
+$7{,}0 \pm 1{,}1\%$ trên moons và $1{,}9 \pm 1{,}0\%$ trên breast cancer. Vùng tốt của hai bộ dữ liệu
+khác nhau rõ rệt: moons cần $\gamma \approx 1$ (biên cong theo hình trăng khuyết), còn breast cancer
+cần $\gamma \in [10^{-3}, 10^{-2}]$ (gần tuyến tính trong 30 chiều). Vòng trong chọn
+$(C, \gamma) = (1, 1)$ hai lần, $(10, 1)$ hai lần và $(10^3, 10^{-1})$ một lần trên moons;
+$(10, 10^{-2})$ ba lần và $(10^2, 10^{-3})$ hai lần trên breast cancer. Lựa chọn thay đổi giữa các fold
+nhưng luôn nằm trên một ``thung lũng'' sai số thấp chạy chéo trong mặt phẳng $(C, \gamma)$:
+$C$ lớn bù cho $\gamma$ nhỏ và ngược lại, vì cả hai cùng điều khiển độ phức tạp của biên.
+Hai góc của heatmap ứng với hai kiểu thất bại:
+\begin{itemize}
+  \item \emph{Thiếu khớp} ($\gamma$ nhỏ, hoặc $C$ rất nhỏ): hàm nhân gần như tuyến tính hoặc chính
+        quy hóa quá mạnh; trên moons sai số dừng ở khoảng $16{,}5$--$17{,}5\%$, ngang SVM tuyến tính
+        (CV $17{,}5\%$ với $C = 1$).
+  \item \emph{Quá khớp} ($\gamma \ge 1$ trên breast cancer): với 30 chiều đã chuẩn hóa, trung vị của
+        $\norm{\vx_i - \vx_j}^2$ là khoảng $41$, nên với $\gamma = 1$ phần lớn
+        $k(\vx_i, \vx_j) \approx e^{-41} \approx 10^{-18}$ khi $i \ne j$; ma trận Gram gần bằng $\mI$, mỗi điểm thành một ``hòn đảo'' riêng. Sai số huấn
+        luyện về $0$ (khi $C \ge 1$) nhưng sai số CV bằng $37{,}3\%$, đúng bằng việc đoán mọi mẫu là lớp đa số.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{C4_sv_margin.pdf}
+\caption{Theo $C$ (trục log): (a) tỉ lệ vector hỗ trợ, (b) độ rộng lề $2/\norm{\vw}$ trong không
+gian đặc trưng (trục log), (c) sai số huấn luyện và CV tại $\gamma$ được vòng trong chọn nhiều nhất.}
+\label{fig:C4-sv-margin}
+\end{figure}
+
+\paragraph{Ảnh hưởng của $C$ (Hình~\ref{fig:C4-sv-margin}).} Trên cả hai bộ dữ liệu và với mọi
+$\gamma$ trong lưới, cả độ rộng lề và số vector hỗ trợ đều \emph{không tăng} khi $C$ tăng. Điều này
+khớp với dạng hinge của Mệnh đề~\ref{prop:B3-hinge}: $C = 1/(\lambda n)$ lớn nghĩa là chính quy hóa
+$\frac\lambda2\norm{\vw}^2$ yếu, phạt vi phạm lề mạnh, nên lề hẹp lại và ít điểm nằm trong lề.
+\begin{itemize}
+  \item Khi $C$ rất nhỏ, mọi $\alpha_i$ bị chặn tại $C$ ($\nsv = n$ trên moons với $C = 10^{-2}$).
+        Khi đó $\vw = C\sum_i y_i\phi(\vx_i)$ tỉ lệ thuận với $C$, nên độ rộng lề tỉ lệ nghịch với $C$:
+        với $\gamma = 10^{-3}$ trên moons, độ rộng là $25{,}1 \to 2{,}51 \to 0{,}251$ khi $C$ tăng
+        $10$ lần mỗi bước.
+  \item Khi $C$ tăng, các vector hỗ trợ chuyển từ bị chặn sang tự do (nằm đúng trên biên lề) và số
+        lượng giảm: trên moons với $\gamma = 1$, $\nsv$ giảm từ $200$ xuống $38$.
+  \item Tại $\gamma$ được chọn (Hình~\ref{fig:C4-sv-margin}c), sai số huấn luyện giảm đơn điệu theo $C$,
+        còn sai số CV có dạng chữ U: trên moons
+        ($\gamma = 1$) nhỏ nhất $6{,}5\%$ tại $C = 1$ rồi tăng lên $10\%$ tại $C = 10^3$. Khoảng cách
+        giữa hai đường là dấu hiệu quá khớp.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{C4_boundaries.pdf}
+\caption{Biên quyết định trên moons (đặc trưng đã chuẩn hóa) cho $C \in \{10^{-1}, 1, 10^2\}$ (hàng)
+và $\gamma \in \{10^{-1}, 1, 10\}$ (cột). Đường liền: $f = 0$; nét đứt: biên lề $f = \pm 1$;
+vòng tròn đen: vector hỗ trợ.}
+\label{fig:C4-boundaries}
+\end{figure}
+
+\paragraph{Ảnh hưởng của $\gamma$ (Hình~\ref{fig:C4-boundaries}).} $\gamma$ là nghịch đảo bình
+phương ``bán kính ảnh hưởng'' của mỗi vector hỗ trợ. Với $\gamma = 10^{-1}$ biên gần như một đường
+cong bậc thấp và không ôm được hai hình trăng khuyết. Với $\gamma = 1$ biên bám đúng hình dạng dữ liệu
+(cấu hình $C = 1$, $\gamma = 1$ ở ô viền đậm của Hình~\ref{fig:C4-heatmap}: CV $6{,}5\%$, $60$ vector hỗ trợ). Với $\gamma = 10$ mỗi
+vector hỗ trợ chỉ ảnh hưởng một vùng nhỏ, biên quấn quanh từng cụm điểm; khi kết hợp $C = 10^2$, sai số
+huấn luyện chỉ $0{,}5\%$ nhưng CV tăng lên $11{,}5\%$. Số vector hỗ trợ cũng tăng trở lại khi $\gamma$
+lớn (ví dụ $91$ so với $40$ ở $C = 10^2$), vì một điểm chỉ ``được che'' bởi các điểm rất gần nó.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{C4_loo_bound.pdf}
+\caption{Sai số bỏ-một so với tỉ lệ vector hỗ trợ cho 30 cấu hình mỗi bộ dữ liệu và hai trường hợp
+lề cứng. Định lý~\ref{thm:B6-loo} khẳng định mọi điểm nằm dưới đường chéo.}
+\label{fig:C4-loo}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Một số cấu hình tiêu biểu: sai số (\%) và cận $\nsv/n$ của Định lý~\ref{thm:B6-loo}}
+\label{tab:C4-loo}
+\begin{tabular}{@{}llrrrrrr@{}}
+\toprule
+Dữ liệu & Cấu hình & $C$ & $\gamma$ & Huấn luyện & CV & LOO & $\nsv/n$ \\
+\midrule
+moons  & ô viền đậm          & $1$      & $1$         & $6{,}0$  & $6{,}5$  & $7{,}5$   & $30{,}0$ \\
+moons  & thiếu khớp          & $10^3$   & $10^{-3}$   & $17{,}0$ & $17{,}0$ & $17{,}0$  & $35{,}0$ \\
+moons  & quá khớp            & $10^3$   & $10$        & $0{,}0$  & $11{,}0$ & $11{,}0$  & $43{,}5$ \\
+moons  & mọi $\alpha_i = C$  & $10^{-2}$& $10^{-3}$   & $16{,}5$ & $17{,}5$ & $100{,}0$ & $100{,}0$ \\
+moons  & lề cứng             & $10^6$   & $3$         & $0{,}0$  & --       & $13{,}5$  & $18{,}0$ \\
+blobs  & lề cứng, tuyến tính & $10^6$   & --          & $0{,}0$  & --       & $0{,}0$   & $2{,}0$ \\
+cancer & ô viền đậm          & $10$     & $10^{-2}$   & $1{,}2$  & $2{,}1$  & $2{,}1$   & $11{,}2$ \\
+cancer & chọn ở 2/5 fold      & $10^2$   & $10^{-3}$   & $1{,}4$  & $1{,}9$  & $2{,}3$   & $9{,}1$ \\
+cancer & quá khớp            & $10$     & $1$         & $0{,}0$  & $36{,}9$ & $36{,}2$  & $99{,}8$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Đối chiếu với cận của B6 (Hình~\ref{fig:C4-loo}, Bảng~\ref{tab:C4-loo}).} Cận
+$\text{LOO} \le \nsv/n$ đúng ở \emph{cả} $62$ cấu hình, gồm hai trường hợp lề cứng (đúng giả thiết của
+Định lý~\ref{thm:B6-loo}) và $60$ cấu hình lề mềm (Nhận xét~\ref{rem:B6-soft}). Một số quan sát:
+\begin{itemize}
+  \item Cận thường lỏng: trung vị của tỉ số $\text{LOO}/(\nsv/n)$ là $0{,}37$ trên moons và $0{,}36$ trên
+        breast cancer, vì phần lớn vector hỗ trợ (dù có $\alpha_i > 0$) vẫn được dự đoán đúng khi bị bỏ ra.
+        Cận có ích nhất khi mô hình thưa: $\nsv/n$ nhỏ thì khoảng cách tuyệt đối tới LOO cũng nhỏ
+        (blobs: cận $2\%$, LOO $0\%$; moons lề cứng: cận $18\%$, LOO $13{,}5\%$).
+  \item Các cấu hình trong vùng sai số thấp đều khá thưa ($\nsv/n$ từ $21{,}5\%$ đến $30\%$ với CV
+        $\le 7\%$ trên moons; từ $7\%$ đến $20\%$ với CV $\le 3\%$ trên breast cancer), phù hợp với trực giác
+        ``mô hình thưa tổng quát hóa tốt'' (Nhận xét~\ref{rem:B6-soft}). Tuy nhiên chỉ dùng
+        $\nsv/n$ để chọn siêu tham số sẽ sai: trên moons, các cấu hình thiếu khớp ($\gamma$ nhỏ, $C$ lớn)
+        có $\nsv/n \approx 35\%$ nhưng sai số $17\%$.
+  \item Sáu cấu hình moons (mọi $\gamma$ với $C = 10^{-2}$, và $C = 10^{-1}$, $\gamma = 10^{-3}$) cho
+        LOO $= 100\%$, chạm đúng cận (một điểm duy nhất ở góc trên phải của Hình~\ref{fig:C4-loo}). Ở đây mọi
+        $\alpha_i = C$, không có vector hỗ trợ tự do nên $b$ được đặt giữa khoảng KKT cho phép, và $f$
+        gần như chỉ còn là hằng số $b$. Moons có đúng $100$ mẫu mỗi lớp; bỏ một mẫu của lớp nào thì lớp
+        kia thành đa số, $b$ nghiêng về lớp kia và mẫu vừa bỏ luôn bị dự đoán sai. Đây là lý do LOO
+        lệch xa CV (chẳng hạn $100\%$ so với $17{,}5\%$): cả $9$ cấu hình có LOO lệch CV hơn $5$ điểm phần trăm
+        đều là cấu hình moons không có vector hỗ trợ tự do, đúng tình huống mà Nhận xét~\ref{rem:B6-soft} loại trừ.
+\end{itemize}
 
 % ---------------------------------------------------------------------
 \subsection{C5. Thời gian huấn luyện: SMO và hạ tọa độ đối ngẫu}\label{sec:C5}

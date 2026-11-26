@@ -1,6 +1,6 @@
 % =====================================================================
 %  Phần B: Chứng minh lý thuyết (P1)
-%  Đã có phát biểu chính xác của từng kết quả; cần viết phần chứng minh.
+%  Phát biểu và chứng minh đầy đủ của B1–B6.
 % =====================================================================
 \section{Cơ sở lý thuyết}\label{sec:theory}
 \owner{P1}
@@ -18,12 +18,45 @@ $H = \{\vz \in \R^d : \vw\T\vz + b = 0\}$. Với mọi $\vx \in \R^d$,
 \end{proposition}
 
 \begin{proof}
-\todo{B1, phần khoảng cách: Cauchy--Schwarz cho cận dưới, chỉ ra điểm đạt dấu bằng.}
+Ta chứng minh hai chiều: mọi điểm của $H$ cách $\vx$ ít nhất một lượng
+$\abs{\vw\T\vx + b}/\norm{\vw}$, và có một điểm của $H$ đạt đúng khoảng cách đó.
+
+\emph{Cận dưới.} Lấy $\vz \in H$ bất kỳ. Vì $\vw\T\vz + b = 0$ nên
+\[
+  \vw\T\vx + b = (\vw\T\vx + b) - (\vw\T\vz + b) = \vw\T(\vx - \vz).
+\]
+Áp dụng bất đẳng thức Cauchy--Schwarz cho hai vector $\vw$ và $\vx - \vz$:
+\[
+  \abs{\vw\T\vx + b} = \abs{\vw\T(\vx - \vz)} \le \norm{\vw}\,\norm{\vx - \vz}.
+\]
+Vì $\vw \ne \vzero$ nên $\norm{\vw} > 0$, chia hai vế cho $\norm{\vw}$ ta được
+$\norm{\vx - \vz} \ge \abs{\vw\T\vx + b}/\norm{\vw}$ với mọi $\vz \in H$.
+
+\emph{Dấu bằng đạt được.} Đặt $t = (\vw\T\vx + b)/\norm{\vw}^2$ và $\vz^\star = \vx - t\vw$,
+tức là đi từ $\vx$ dọc theo pháp tuyến $\vw$. Khi đó
+\[
+  \vw\T\vz^\star + b = \vw\T\vx + b - t\,\vw\T\vw
+  = (\vw\T\vx + b) - \frac{\vw\T\vx + b}{\norm{\vw}^2}\,\norm{\vw}^2 = 0,
+\]
+nên $\vz^\star \in H$, và
+\[
+  \norm{\vx - \vz^\star} = \norm{t\vw} = \abs{t}\,\norm{\vw}
+  = \frac{\abs{\vw\T\vx + b}}{\norm{\vw}^2}\,\norm{\vw} = \frac{\abs{\vw\T\vx + b}}{\norm{\vw}}.
+\]
+Hai phần trên cho thấy giá trị nhỏ nhất tồn tại, đạt tại $\vz^\star$, và bằng
+$\abs{\vw\T\vx + b}/\norm{\vw}$.
 \end{proof}
 
+\begin{remark}
+Đại lượng có dấu $(\vw\T\vx + b)/\norm{\vw}$ dương khi $\vx$ nằm về phía mà $\vw$ chỉ tới,
+âm ở phía ngược lại. Vì vậy với nhãn $y_i \in \{-1, +1\}$, số
+$y_i(\vw\T\vx_i + b)/\norm{\vw}$ bằng khoảng cách từ $\vx_i$ tới $H$ nếu $\vx_i$ được
+phân loại đúng, và mang dấu âm nếu bị phân loại sai. Đây là \emph{lề hình học} của mẫu $i$.
+\end{remark}
+
 \begin{proposition}\label{prop:B1-hardmargin}
-Giả sử dữ liệu $\{(\vx_i, y_i)\}_{i=1}^n$ khả tách tuyến tính. Bài toán cực đại
-lề hình học
+Giả sử dữ liệu $\{(\vx_i, y_i)\}_{i=1}^n$ khả tách tuyến tính và mỗi lớp có ít nhất một mẫu.
+Bài toán cực đại lề hình học
 \begin{equation}\label{eq:B1-maxmargin}
   \max_{\vw \ne \vzero,\, b} \; \min_{1 \le i \le n} \frac{y_i(\vw\T\vx_i + b)}{\norm{\vw}}
 \end{equation}
@@ -36,9 +69,83 @@ theo nghĩa: siêu phẳng tối ưu của hai bài toán trùng nhau, và lề 
 \end{proposition}
 
 \begin{proof}
-\todo{B1, phần tương đương: bất biến tỉ lệ, chuẩn hóa $\min_i y_i(\vw\T\vx_i+b) = 1$,
-chứng minh có ràng buộc đạt dấu bằng tại nghiệm của \eqref{eq:B1-hardmargin}.}
+Với $\vw \ne \vzero$, ký hiệu lề hình học
+$\gamma(\vw, b) = \min_i y_i(\vw\T\vx_i + b)/\norm{\vw}$ và tập ràng buộc của \eqref{eq:B1-hardmargin}
+\[
+  F = \{(\vw, b) : y_i(\vw\T\vx_i + b) \ge 1, \; i = 1, \dots, n\}.
+\]
+Chọn một chỉ số $p$ có $y_p = +1$ và một chỉ số $q$ có $y_q = -1$.
+
+\emph{Bước 1 (tính chất của $F$).}
+(a) $F \ne \emptyset$: vì dữ liệu khả tách nên có $(\tilde\vw, \tilde b)$ với
+$\tilde s = \min_i y_i(\tilde\vw\T\vx_i + \tilde b) > 0$; khi đó
+$(\tilde\vw/\tilde s, \tilde b/\tilde s) \in F$.
+(b) Mọi $(\vw, b) \in F$ đều có $\vw \ne \vzero$: nếu $\vw = \vzero$ thì ràng buộc của $p$ và $q$
+cho $b \ge 1$ và $-b \ge 1$, mâu thuẫn.
+(c) $F$ là giao của $n$ nửa không gian đóng nên là tập lồi, đóng.
+
+\emph{Bước 2 (bất biến tỉ lệ).} Với mọi $c > 0$,
+\[
+  \gamma(c\vw, cb) = \min_i \frac{c\, y_i(\vw\T\vx_i + b)}{c\norm{\vw}} = \gamma(\vw, b).
+\]
+Điều kiện $c > 0$ là cần thiết: với $c < 0$ mọi dấu $y_i(\cdot)$ bị đảo.
+Hệ quả: nếu $\gamma(\vw, b) > 0$, đặt $s = \min_i y_i(\vw\T\vx_i + b) > 0$ thì
+$(\bar\vw, \bar b) = (\vw/s, b/s) \in F$, $\min_i y_i(\bar\vw\T\vx_i + \bar b) = 1$ và
+$\gamma(\vw, b) = \gamma(\bar\vw, \bar b) = 1/\norm{\bar\vw}$.
+
+\emph{Bước 3 (\eqref{eq:B1-hardmargin} có nghiệm).} Lấy $(\vw_0, b_0) \in F$ và $R = \norm{\vw_0}$.
+Với $(\vw, b) \in F$ thỏa $\norm{\vw} \le R$, ràng buộc của $p$ và $q$ cùng Cauchy--Schwarz cho
+\[
+  1 - R\norm{\vx_p} \;\le\; 1 - \vw\T\vx_p \;\le\; b \;\le\; -1 - \vw\T\vx_q \;\le\; -1 + R\norm{\vx_q}.
+\]
+Vậy $S = \{(\vw, b) \in F : \norm{\vw} \le R\}$ đóng, bị chặn, khác rỗng, tức là compact,
+nên hàm liên tục $\frac12\norm{\vw}^2$ đạt giá trị nhỏ nhất trên $S$ (định lý Weierstrass).
+Mọi điểm của $F \setminus S$ có $\frac12\norm{\vw}^2 > \frac12 R^2 \ge \frac12\norm{\vw_0}^2$,
+nên điểm cực tiểu trên $S$ cũng là nghiệm của \eqref{eq:B1-hardmargin}.
+
+\emph{Bước 4 (tại nghiệm, có ràng buộc chặt).} Gọi $(\vw^\star, b^\star)$ là một nghiệm của
+\eqref{eq:B1-hardmargin} và $s^\star = \min_i y_i(\vw^{\star\top}\vx_i + b^\star) \ge 1$.
+Giả sử $s^\star > 1$. Khi đó $(\vw^\star/s^\star, b^\star/s^\star) \in F$ và, vì $\vw^\star \ne \vzero$,
+\[
+  \tfrac12\norm{\vw^\star/s^\star}^2 = \tfrac{1}{(s^\star)^2}\cdot\tfrac12\norm{\vw^\star}^2
+  < \tfrac12\norm{\vw^\star}^2,
+\]
+mâu thuẫn với tính tối ưu. Vậy $s^\star = 1$ và $\gamma(\vw^\star, b^\star) = 1/\norm{\vw^\star}$.
+
+\emph{Bước 5 (nghiệm của \eqref{eq:B1-hardmargin} cực đại lề).} Lấy $\vw \ne \vzero$, $b$ bất kỳ.
+Nếu $\gamma(\vw, b) \le 0$ thì hiển nhiên $\gamma(\vw, b) < \gamma(\vw^\star, b^\star)$.
+Nếu $\gamma(\vw, b) > 0$, theo Bước 2 có $(\bar\vw, \bar b) \in F$ với
+$\gamma(\vw, b) = 1/\norm{\bar\vw}$. Do $(\vw^\star, b^\star)$ tối ưu trên $F$ nên
+$\norm{\bar\vw} \ge \norm{\vw^\star}$, suy ra $\gamma(\vw, b) \le 1/\norm{\vw^\star} = \gamma(\vw^\star, b^\star)$.
+Vậy giá trị lớn nhất của \eqref{eq:B1-maxmargin} bằng $1/\norm{\vw^\star}$ và đạt tại $(\vw^\star, b^\star)$.
+
+\emph{Bước 6 (nghiệm duy nhất, cùng một siêu phẳng).}
+(a) $\vw^\star$ duy nhất: nếu $(\vw_1, b_1)$, $(\vw_2, b_2)$ cùng tối ưu với giá trị $p^\star$ thì
+trung điểm của chúng thuộc $F$ (Bước 1c) và theo đẳng thức hình bình hành
+\[
+  \tfrac12\norm{\tfrac{\vw_1 + \vw_2}{2}}^2
+  = \tfrac14\norm{\vw_1}^2 + \tfrac14\norm{\vw_2}^2 - \tfrac18\norm{\vw_1 - \vw_2}^2
+  = p^\star - \tfrac18\norm{\vw_1 - \vw_2}^2,
+\]
+nhỏ hơn $p^\star$ nếu $\vw_1 \ne \vw_2$, mâu thuẫn.
+(b) $b^\star$ duy nhất: nếu $(\vw^\star, b_1)$ và $(\vw^\star, b_2)$ cùng tối ưu với $b_1 < b_2$ thì
+$(\vw^\star, \bar b)$, $\bar b = \frac{b_1 + b_2}{2}$, cũng tối ưu. Với $y_i = +1$:
+$\vw^{\star\top}\vx_i + \bar b > \vw^{\star\top}\vx_i + b_1 \ge 1$; với $y_i = -1$:
+$-(\vw^{\star\top}\vx_i + \bar b) > -(\vw^{\star\top}\vx_i + b_2) \ge 1$. Như vậy mọi ràng buộc đều
+ngặt tại một nghiệm, trái với Bước 4.
+(c) Nếu $(\vw, b)$ là một nghiệm của \eqref{eq:B1-maxmargin} thì $\gamma(\vw, b) = 1/\norm{\vw^\star} > 0$;
+điểm chuẩn hóa $(\bar\vw, \bar b) \in F$ của nó có $\norm{\bar\vw} = 1/\gamma(\vw, b) = \norm{\vw^\star}$,
+nên cũng là nghiệm của \eqref{eq:B1-hardmargin}, do đó $(\bar\vw, \bar b) = (\vw^\star, b^\star)$.
+Tức là $(\vw, b) = s\,(\vw^\star, b^\star)$ với $s > 0$, mô tả cùng một siêu phẳng.
 \end{proof}
+
+\begin{remark}
+Bài toán \eqref{eq:B1-maxmargin} có vô số nghiệm (cả tia $\{c(\vw^\star, b^\star) : c > 0\}$),
+không lồi và không khả vi. Việc cố định lề hàm $\min_i y_i(\vw\T\vx_i + b) = 1$ chọn ra đúng
+một đại diện trên tia đó và biến bài toán thành quy hoạch toàn phương lồi \eqref{eq:B1-hardmargin}.
+Hệ số $\frac12$ và việc dùng $\norm{\vw}^2$ thay cho $\norm{\vw}$ chỉ để hàm mục tiêu khả vi và có
+đạo hàm gọn; chúng không làm thay đổi nghiệm vì $t \mapsto \frac12 t^2$ tăng trên $[0, \infty)$.
+\end{remark}
 
 % ---------------------------------------------------------------------
 \subsection{B2. Bài toán đối ngẫu của SVM lề mềm và điều kiện KKT}\label{sec:B2}
@@ -70,10 +177,75 @@ Hơn nữa, với mọi $i$:
 \end{theorem}
 
 \begin{proof}
-\todo{B2: Lagrangian với $\alpha_i, \mu_i \ge 0$; điều kiện dừng;
-thay ngược để ra \eqref{eq:B2-dual}; đối ngẫu mạnh (Slater);
-bù lệch để ra 3 trường hợp KKT.}
+Để gọn, viết $\phi_i = \phi(\vx_i)$ và giả sử $\phi$ nhận giá trị trong một không gian Hilbert
+(chẳng hạn $\R^D$). Bài toán \eqref{eq:B2-primal} có hàm mục tiêu lồi và mọi ràng buộc đều
+affine theo $(\vw, b, \vxi)$.
+
+\emph{Bước 1 (Lagrangian).} Gán nhân tử $\alpha_i \ge 0$ cho ràng buộc
+$y_i(\vw\T\phi_i + b) \ge 1 - \xi_i$ và $\mu_i \ge 0$ cho ràng buộc $\xi_i \ge 0$:
+\[
+  L(\vw, b, \vxi, \valpha, \vmu) = \frac12\norm{\vw}^2 + C\sum_i \xi_i
+  - \sum_i \alpha_i\bigl[y_i(\vw\T\phi_i + b) - 1 + \xi_i\bigr] - \sum_i \mu_i\xi_i .
+\]
+Gom các số hạng theo từng biến:
+\[
+  L = \Bigl(\frac12\norm{\vw}^2 - \vw\T\vu\Bigr) - b\sum_i \alpha_i y_i
+  + \sum_i \xi_i (C - \alpha_i - \mu_i) + \sum_i \alpha_i,
+  \qquad \vu \coloneqq \sum_i \alpha_i y_i \phi_i .
+\]
+
+\emph{Bước 2 (hàm đối ngẫu).} Hàm đối ngẫu là $g(\valpha, \vmu) = \inf_{\vw, b, \vxi} L$.
+\begin{itemize}
+  \item Theo $b$: $L$ tuyến tính theo $b$, nên $\inf_b L = -\infty$ trừ khi $\sum_i \alpha_i y_i = 0$.
+  \item Theo $\xi_i$: tương tự, $\inf_{\xi_i} L = -\infty$ trừ khi $C - \alpha_i - \mu_i = 0$.
+  \item Theo $\vw$: hoàn thành bình phương,
+  $\frac12\norm{\vw}^2 - \vw\T\vu = \frac12\norm{\vw - \vu}^2 - \frac12\norm{\vu}^2$,
+  nhỏ nhất tại $\vw = \vu$ với giá trị $-\frac12\norm{\vu}^2$.
+\end{itemize}
+Vậy khi $\sum_i \alpha_i y_i = 0$ và $\mu_i = C - \alpha_i$,
+\[
+  g(\valpha, \vmu) = \sum_i \alpha_i - \frac12\Bigl\lVert \sum_i \alpha_i y_i \phi_i \Bigr\rVert^2
+  = \sum_i \alpha_i - \frac12\sum_{i,j} \alpha_i \alpha_j y_i y_j k(\vx_i, \vx_j) = \Dual(\valpha),
+\]
+và $g = -\infty$ trong mọi trường hợp khác. Điều kiện $\mu_i = C - \alpha_i \ge 0$ cùng
+$\alpha_i \ge 0$ tương đương $0 \le \alpha_i \le C$. Cực đại $g$ chính là bài toán \eqref{eq:B2-dual}.
+
+\emph{Bước 3 (đối ngẫu mạnh và KKT).} Bài toán gốc lồi, ràng buộc affine và khả thi
+(ví dụ $\vw = \vzero$, $b = 0$, $\xi_i = 1$), nên theo điều kiện Slater dạng ràng buộc affine
+\citep[Mục 5.2.3]{boyd2004convex}, đối ngẫu mạnh xảy ra: giá trị tối ưu của hai bài toán bằng nhau.
+Khi đó $(\vw^\star, b^\star, \vxi^\star)$ và $(\valpha^\star, \vmu^\star)$ lần lượt là nghiệm
+của bài toán gốc và đối ngẫu khi và chỉ khi chúng thỏa các điều kiện KKT
+\citep[Mục 5.5.3]{boyd2004convex}:
+\begin{enumerate}
+  \item khả thi gốc: $y_i f(\vx_i) \ge 1 - \xi_i^\star$ và $\xi_i^\star \ge 0$,
+        với $f(\vx) = \vw^{\star\top}\phi(\vx) + b^\star$;
+  \item khả thi đối ngẫu: $\alpha_i^\star \ge 0$, $\mu_i^\star \ge 0$;
+  \item điều kiện dừng: $\vw^\star = \sum_i \alpha_i^\star y_i \phi_i$, $\sum_i \alpha_i^\star y_i = 0$,
+        $\alpha_i^\star + \mu_i^\star = C$;
+  \item bù lệch: $\alpha_i^\star\bigl[y_i f(\vx_i) - 1 + \xi_i^\star\bigr] = 0$ và $\mu_i^\star \xi_i^\star = 0$.
+\end{enumerate}
+Từ điều kiện dừng,
+$f(\vx) = \sum_i \alpha_i^\star y_i \phi_i\T\phi(\vx) + b^\star = \sum_i \alpha_i^\star y_i k(\vx_i, \vx) + b^\star$.
+
+\emph{Bước 4 (ba trường hợp).}
+\begin{itemize}
+  \item $\alpha_i^\star = 0$: khi đó $\mu_i^\star = C > 0$, bù lệch cho $\xi_i^\star = 0$,
+        và khả thi gốc cho $y_i f(\vx_i) \ge 1$.
+  \item $0 < \alpha_i^\star < C$: khi đó $\mu_i^\star = C - \alpha_i^\star > 0$ nên $\xi_i^\star = 0$;
+        vì $\alpha_i^\star > 0$, bù lệch cho $y_i f(\vx_i) = 1 - \xi_i^\star = 1$.
+  \item $\alpha_i^\star = C$: vì $\alpha_i^\star > 0$, bù lệch cho
+        $y_i f(\vx_i) = 1 - \xi_i^\star \le 1$ do $\xi_i^\star \ge 0$. \qedhere
+\end{itemize}
 \end{proof}
+
+\begin{remark}\label{rem:B2-kkt}
+Chiều ngược lại cũng suy ra được từ KKT: nếu $y_i f(\vx_i) > 1$ thì
+$y_i f(\vx_i) - 1 + \xi_i^\star > 0$ nên $\alpha_i^\star = 0$; nếu $y_i f(\vx_i) < 1$ thì
+$\xi_i^\star \ge 1 - y_i f(\vx_i) > 0$ nên $\mu_i^\star = 0$, tức $\alpha_i^\star = C$.
+Như vậy mẫu nằm ngoài lề không ảnh hưởng tới nghiệm; chỉ các \emph{vector hỗ trợ}
+($\alpha_i^\star > 0$) xuất hiện trong $f$. Hệ số chặn được tính từ một vector hỗ trợ tự do
+bất kỳ ($0 < \alpha_i^\star < C$): $b^\star = y_i - \sum_j \alpha_j^\star y_j k(\vx_j, \vx_i)$.
+\end{remark}
 
 % ---------------------------------------------------------------------
 \subsection{B3. Dạng hàm mất mát hinge}\label{sec:B3}
@@ -89,9 +261,43 @@ Ngoài ra, hàm $t \mapsto \hinge{t}$ lồi và $\hinge{t} \ge \ind{t \le 0}$ v�
 \end{proposition}
 
 \begin{proof}
-\todo{B3: tại nghiệm $\xi_i = \hinge{y_i f(\vx_i)}$; chia hàm mục tiêu cho $Cn$;
-lồi vì là max của hai hàm affine; cận trên xét 2 trường hợp $t \le 0$, $t > 0$.}
+Ký hiệu $h(t) = \hinge{t}$ và $f(\vx) = \vw\T\phi(\vx) + b$.
+
+\emph{Bước 1 (khử biến bù).} Cố định $(\vw, b)$. Hai ràng buộc của $\xi_i$ trong
+\eqref{eq:B2-primal} là $\xi_i \ge 1 - y_i f(\vx_i)$ và $\xi_i \ge 0$, tương đương
+$\xi_i \ge h(y_i f(\vx_i))$. Hàm mục tiêu tăng ngặt theo mỗi $\xi_i$ (vì $C > 0$), nên với
+$(\vw, b)$ cố định, $\vxi$ tốt nhất là $\xi_i = h(y_i f(\vx_i))$. Do đó $(\vw^\star, b^\star, \vxi^\star)$
+là nghiệm của \eqref{eq:B2-primal} khi và chỉ khi $\xi_i^\star = h(y_i f^\star(\vx_i))$ và
+$(\vw^\star, b^\star)$ cực tiểu hóa
+\[
+  P(\vw, b) = \frac12\norm{\vw}^2 + C\sum_{i=1}^n h\bigl(y_i f(\vx_i)\bigr).
+\]
+
+\emph{Bước 2 (đổi tỉ lệ).} Với $\lambda = 1/(Cn)$,
+\[
+  P(\vw, b) = Cn\Bigl[\frac{1}{Cn}\cdot\frac12\norm{\vw}^2 + \frac1n\sum_{i=1}^n h\bigl(y_i f(\vx_i)\bigr)\Bigr]
+  = Cn \cdot J_\lambda(\vw, b),
+\]
+trong đó $J_\lambda$ là hàm mục tiêu của \eqref{eq:B3-erm}. Nhân với hằng số dương $Cn$
+không đổi tập nghiệm, nên $P$ và $J_\lambda$ có cùng nghiệm.
+
+\emph{Bước 3 (tính lồi).} $h(t) = \max\{\ell_1(t), \ell_2(t)\}$ với $\ell_1(t) = 0$,
+$\ell_2(t) = 1 - t$ là các hàm affine. Với $t, s \in \R$ và $\theta \in [0, 1]$, mỗi $\ell_k$ thỏa
+$\ell_k(\theta t + (1-\theta)s) = \theta\ell_k(t) + (1-\theta)\ell_k(s) \le \theta h(t) + (1-\theta)h(s)$;
+lấy max theo $k$ ta được $h(\theta t + (1-\theta)s) \le \theta h(t) + (1-\theta)h(s)$.
+
+\emph{Bước 4 (cận trên của mất mát 0--1).} Nếu $t \le 0$ thì $h(t) \ge 1 - t \ge 1 = \ind{t \le 0}$.
+Nếu $t > 0$ thì $h(t) \ge 0 = \ind{t \le 0}$.
 \end{proof}
+
+\begin{remark}
+Vì $y_i f(\vx_i)$ là hàm affine của $(\vw, b)$ và $h$ lồi, $J_\lambda$ là tổng của một hàm lồi
+ngặt theo $\vw$ và các hàm lồi, nên \eqref{eq:B3-erm} là bài toán lồi. Bước 4 cho
+$\frac1n\sum_i \ind{y_i f(\vx_i) \le 0} \le \frac1n\sum_i h(y_i f(\vx_i))$: sai số huấn luyện bị chặn
+trên bởi rủi ro hinge. Thay vì cực tiểu mất mát 0--1 (không lồi, NP-khó), SVM cực tiểu một cận
+trên lồi của nó cộng với số hạng chính quy hóa $\frac\lambda2\norm{\vw}^2$. Quan hệ $C = 1/(\lambda n)$
+cho thấy $C$ lớn tương ứng với chính quy hóa yếu.
+\end{remark}
 
 % ---------------------------------------------------------------------
 \subsection{B4. Định lý biểu diễn}\label{sec:B4}
@@ -100,19 +306,53 @@ lồi vì là max của hai hàm affine; cận trên xét 2 trường hợp $t \
 Cho $k$ là hàm nhân xác định dương trên $\X$ với RKHS $\Hk$, dữ liệu
 $(\vx_1, y_1), \dots, (\vx_n, y_n)$, hàm mất mát bất kỳ
 $c : (\X \times \R \times \R)^n \to \R \cup \{\infty\}$ và
-$\Omega : [0, \infty) \to \R$ tăng nghiêm ngặt. Khi đó mọi nghiệm $f^\star \in \Hk$ của
-\[
-  \min_{f \in \Hk} \; c\bigl((\vx_1, y_1, f(\vx_1)), \dots, (\vx_n, y_n, f(\vx_n))\bigr)
+$\Omega : [0, \infty) \to \R$ tăng nghiêm ngặt. Xét bài toán
+\begin{equation}\label{eq:B4-risk}
+  \min_{f \in \Hk} \; R(f) \coloneqq c\bigl((\vx_1, y_1, f(\vx_1)), \dots, (\vx_n, y_n, f(\vx_n))\bigr)
   + \Omega\bigl(\Hnorm{f}\bigr)
-\]
+\end{equation}
+và giả sử giá trị nhỏ nhất của nó hữu hạn. Khi đó mọi nghiệm $f^\star$ của \eqref{eq:B4-risk}
 đều có dạng $f^\star = \sum_{i=1}^n \alpha_i k(\vx_i, \cdot)$ với $\alpha_i \in \R$.
 \end{theorem}
 
 \begin{proof}
-\todo{B4: phân tích $f = f_\parallel + f_\perp$ với $f_\parallel \in \spn\{k(\vx_i,\cdot)\}$;
-tính chất tái sinh cho $f(\vx_i) = f_\parallel(\vx_i)$; Pythagoras;
-$\Omega$ tăng nghiêm ngặt nên $f_\perp = 0$.}
+Nhắc lại hai tính chất định nghĩa RKHS \citep{aronszajn1950theory}: với mọi $\vx \in \X$,
+hàm $k(\vx, \cdot)$ thuộc $\Hk$, và với mọi $f \in \Hk$ có \emph{tính chất tái sinh}
+$f(\vx) = \Hinner{f}{k(\vx, \cdot)}$.
+
+\emph{Bước 1 (phân tích trực giao).} Đặt $V = \spn\{k(\vx_1, \cdot), \dots, k(\vx_n, \cdot)\}$.
+$V$ hữu hạn chiều nên là không gian con đóng của $\Hk$, và theo định lý chiếu trực giao mọi
+$f \in \Hk$ viết được duy nhất dưới dạng $f = f_\parallel + f_\perp$ với $f_\parallel \in V$ và
+$f_\perp \perp V$.
+
+\emph{Bước 2 (giá trị tại dữ liệu chỉ phụ thuộc $f_\parallel$).} Với mỗi $j$, vì
+$k(\vx_j, \cdot) \in V$ nên $\Hinner{f_\perp}{k(\vx_j, \cdot)} = 0$, do đó
+\[
+  f(\vx_j) = \Hinner{f_\parallel + f_\perp}{k(\vx_j, \cdot)}
+  = \Hinner{f_\parallel}{k(\vx_j, \cdot)} = f_\parallel(\vx_j).
+\]
+Vậy số hạng mất mát $c(\cdots)$ của $f$ và của $f_\parallel$ bằng nhau.
+
+\emph{Bước 3 (chuẩn).} Theo định lý Pythagoras,
+$\Hnorm{f}^2 = \Hnorm{f_\parallel}^2 + \Hnorm{f_\perp}^2 \ge \Hnorm{f_\parallel}^2$, dấu bằng
+khi và chỉ khi $f_\perp = 0$.
+
+\emph{Bước 4 (kết luận).} Giả sử $f^\star$ là một nghiệm nhưng $f^\star_\perp \ne 0$. Khi đó
+$\Hnorm{f^\star_\parallel} < \Hnorm{f^\star}$ và vì $\Omega$ tăng nghiêm ngặt,
+$\Omega(\Hnorm{f^\star_\parallel}) < \Omega(\Hnorm{f^\star})$. Kết hợp Bước 2 và giá trị
+$R(f^\star)$ hữu hạn, ta được $R(f^\star_\parallel) < R(f^\star)$, mâu thuẫn. Vậy
+$f^\star = f^\star_\parallel \in V$, tức $f^\star = \sum_i \alpha_i k(\vx_i, \cdot)$.
 \end{proof}
+
+\begin{remark}
+SVM lề mềm là trường hợp riêng với $\Omega(t) = \frac12 t^2$ và
+$c = C\sum_i \hinge{y_i(f(\vx_i) + b)}$. Hệ số chặn $b$ không bị chính quy hóa; phiên bản
+\emph{bán tham số} của định lý \citep{scholkopf2001generalized} cho nghiệm dạng
+$f^\star + b$ với $f^\star \in V$. Đây là lý do nghiệm SVM chỉ cần $n$ hệ số $\alpha_i$ và chỉ
+truy cập dữ liệu qua $k(\vx_i, \vx_j)$, dù $\Hk$ có thể vô hạn chiều (như với hàm nhân Gauss).
+Nếu $\Omega$ chỉ không giảm thì lập luận trên vẫn cho thấy \emph{có ít nhất một} nghiệm dạng
+này (thay $f^\star$ bởi $f^\star_\parallel$), nhưng không phải mọi nghiệm.
+\end{remark}
 
 % ---------------------------------------------------------------------
 \subsection{B5. Tính chất đóng của hàm nhân xác định dương}\label{sec:B5}
@@ -129,7 +369,18 @@ $\mathbf{A} \circ \mathbf{B}$ cũng nửa xác định dương.
 \end{lemma}
 
 \begin{proof}
-\todo{Phân tích phổ $\mathbf{A} = \sum_k \lambda_k \vu_k\vu_k\T$, $\lambda_k \ge 0$.}
+Vì $\mathbf{A}$, $\mathbf{B}$ đối xứng nửa xác định dương, theo định lý phổ
+$\mathbf{A} = \sum_k \lambda_k \vu_k\vu_k\T$ và $\mathbf{B} = \sum_l \mu_l \vect{v}_l\vect{v}_l\T$ với
+$\lambda_k, \mu_l \ge 0$. Phần tử $(i, j)$ của $(\vu\vu\T) \circ (\vect{v}\vect{v}\T)$ là
+$u_i u_j v_i v_j = (\vu \circ \vect{v})_i (\vu \circ \vect{v})_j$, nên
+$(\vu\vu\T) \circ (\vect{v}\vect{v}\T) = (\vu \circ \vect{v})(\vu \circ \vect{v})\T$. Tích Hadamard
+tuyến tính theo từng thừa số, do đó với mọi $\vc \in \R^m$,
+\[
+  \vc\T(\mathbf{A} \circ \mathbf{B})\vc
+  = \sum_{k,l} \lambda_k \mu_l\, \vc\T(\vu_k \circ \vect{v}_l)(\vu_k \circ \vect{v}_l)\T\vc
+  = \sum_{k,l} \lambda_k \mu_l \bigl((\vu_k \circ \vect{v}_l)\T\vc\bigr)^2 \ge 0.
+\]
+Hiển nhiên $\mathbf{A} \circ \mathbf{B}$ đối xứng. Vậy $\mathbf{A} \circ \mathbf{B}$ nửa xác định dương.
 \end{proof}
 
 \begin{proposition}\label{prop:B5-closure}
@@ -140,8 +391,24 @@ xác định dương: (i) $k_1 + k_2$; (ii) $c\,k_1$ với $c \ge 0$; (iii) $k_1
 \end{proposition}
 
 \begin{proof}
-\todo{(i)(ii) trực tiếp; (iii) Bổ đề~\ref{lem:B5-schur}; (iv) bất đẳng thức không ngặt
-bảo toàn qua giới hạn; (v) chuỗi Taylor + (i)--(iv).}
+Cố định $m$, các điểm $\vx_1, \dots, \vx_m$ và $\vc \in \R^m$; gọi $\mK_1$, $\mK_2$ là ma trận Gram
+của $k_1$, $k_2$ trên các điểm này. Tính đối xứng của các hàm mới là hiển nhiên; ta chỉ cần
+kiểm tra $\vc\T\mK\vc \ge 0$ cho ma trận Gram $\mK$ tương ứng.
+\begin{enumerate}
+  \item[(i)] Ma trận Gram của $k_1 + k_2$ là $\mK_1 + \mK_2$, và
+        $\vc\T(\mK_1 + \mK_2)\vc = \vc\T\mK_1\vc + \vc\T\mK_2\vc \ge 0$.
+  \item[(ii)] $\vc\T(c\mK_1)\vc = c\,\vc\T\mK_1\vc \ge 0$ vì $c \ge 0$.
+  \item[(iii)] Ma trận Gram của $k_1 k_2$ có phần tử $k_1(\vx_i, \vx_j)k_2(\vx_i, \vx_j)$, tức là
+        $\mK_1 \circ \mK_2$, nửa xác định dương theo Bổ đề~\ref{lem:B5-schur}.
+  \item[(iv)] Với mỗi $m'$, $\sum_{i,j} c_i c_j k_{m'}(\vx_i, \vx_j) \ge 0$. Đây là tổng hữu hạn
+        của các dãy hội tụ, nên khi $m' \to \infty$ nó hội tụ về $\sum_{i,j} c_i c_j k(\vx_i, \vx_j)$.
+        Giới hạn của một dãy số không âm thì không âm.
+  \item[(v)] Hàm hằng $1$ xác định dương vì ma trận Gram của nó là $\ve\ve\T$ và
+        $\vc\T\ve\ve\T\vc = (\sum_i c_i)^2 \ge 0$. Theo (iii) và quy nạp, $k_1^p$ xác định dương
+        với mọi $p \in \N$. Theo (i), (ii), tổng riêng $s_N = \sum_{p=0}^N k_1^p / p!$ xác định dương.
+        Chuỗi Taylor của hàm mũ hội tụ tại mọi điểm nên $s_N(\vx, \vz) \to \exp(k_1(\vx, \vz))$,
+        và theo (iv), $\exp(k_1)$ xác định dương. \qedhere
+\end{enumerate}
 \end{proof}
 
 \begin{corollary}\label{cor:B5-gauss}
@@ -149,8 +416,28 @@ Với mọi $\gamma > 0$, hàm nhân Gauss $k(\vx, \vz) = \exp(-\gamma\norm{\vx 
 \end{corollary}
 
 \begin{proof}
-\todo{Viết $k(\vx,\vz) = g(\vx)\,g(\vz)\exp(2\gamma\vx\T\vz)$ với $g(\vx) = \exp(-\gamma\norm{\vx}^2)$.}
+Khai triển $\norm{\vx - \vz}^2 = \norm{\vx}^2 + \norm{\vz}^2 - 2\vx\T\vz$ được
+\[
+  k(\vx, \vz) = g(\vx)\, g(\vz)\, \exp(2\gamma\,\vx\T\vz), \qquad g(\vx) = \exp(-\gamma\norm{\vx}^2) > 0.
+\]
+Ta chứng minh từng thừa số.
+\begin{enumerate}
+  \item Hàm nhân tuyến tính $\vx\T\vz$ xác định dương: với ma trận dữ liệu $\mathbf{X}$ (các hàng là
+        $\vx_i\T$), ma trận Gram là $\mathbf{X}\mathbf{X}\T$ và
+        $\vc\T\mathbf{X}\mathbf{X}\T\vc = \norm{\mathbf{X}\T\vc}^2 \ge 0$.
+  \item Theo Mệnh đề~\ref{prop:B5-closure}(ii), $2\gamma\,\vx\T\vz$ xác định dương; theo (v),
+        $k'(\vx, \vz) = \exp(2\gamma\,\vx\T\vz)$ xác định dương.
+  \item Hàm $g(\vx)g(\vz)$ xác định dương vì
+        $\sum_{i,j} c_i c_j g(\vx_i) g(\vx_j) = \bigl(\sum_i c_i g(\vx_i)\bigr)^2 \ge 0$.
+        Theo (iii), tích $g(\vx)g(\vz)\,k'(\vx, \vz) = k(\vx, \vz)$ xác định dương. \qedhere
+\end{enumerate}
 \end{proof}
+
+\begin{remark}
+Hàm nhân đa thức $(\vx\T\vz + c)^p$ với $c \ge 0$, $p \in \N$ cũng xác định dương theo cùng cách:
+$\vx\T\vz + c$ là tổng của hàm nhân tuyến tính và hằng số không âm, rồi áp dụng (iii) $p$ lần.
+Như vậy cả ba hàm nhân dùng trong Phần A đều hợp lệ.
+\end{remark}
 
 % ---------------------------------------------------------------------
 \subsection{B6. Cận sai số kiểm định chéo bỏ-một}\label{sec:B6}
@@ -165,6 +452,45 @@ cả $n$ mẫu. Gọi $f^{(-i)}$ là SVM lề cứng huấn luyện khi bỏ m�
 \end{theorem}
 
 \begin{proof}
-\todo{B6: bỏ mẫu có $\alpha_i = 0$ thì nghiệm cũ vẫn thỏa KKT trên tập còn lại;
-dùng tính duy nhất của $\vw^\star$; mẫu đó có $y_i f(\vx_i) \ge 1$ nên không gây lỗi.}
+SVM lề cứng là bài toán \eqref{eq:B1-hardmargin} với $\vx_i$ thay bởi $\phi(\vx_i)$; giả sử mỗi lớp
+có ít nhất một mẫu. Lập luận ở Mục~\ref{sec:B2} (bỏ biến bù, tức ràng buộc $\alpha_i \le C$ biến mất)
+cho thấy $(\vw^\star, b^\star)$ là nghiệm khi và chỉ khi tồn tại $\valpha$ thỏa KKT:
+\[
+  \vw^\star = \sum_j \alpha_j y_j \phi(\vx_j), \quad \sum_j \alpha_j y_j = 0, \quad \alpha_j \ge 0, \quad
+  y_j f(\vx_j) \ge 1, \quad \alpha_j\bigl(y_j f(\vx_j) - 1\bigr) = 0 .
+\]
+Theo Mệnh đề~\ref{prop:B1-hardmargin} (Bước 6, lập luận không đổi trong không gian đặc trưng),
+nghiệm $(\vw^\star, b^\star)$ là duy nhất. Đặt $\SV = \{j : \alpha_j > 0\}$.
+
+\emph{Bước 1 ($\SV$ chứa cả hai lớp).} $\vw^\star \ne \vzero$ (Mệnh đề~\ref{prop:B1-hardmargin}, Bước 1b)
+nên $\SV \ne \emptyset$. Vì $\sum_{j \in \SV} \alpha_j y_j = 0$ với mọi $\alpha_j > 0$, các $y_j$
+trong $\SV$ không thể cùng dấu.
+
+\emph{Bước 2 (bỏ một mẫu không phải vector hỗ trợ).} Lấy $i \notin \SV$, tức $\alpha_i = 0$. Tập dữ liệu
+$D^{(-i)}$ (bỏ mẫu $i$) vẫn khả tách và chứa $\SV$, nên chứa cả hai lớp. Xét $(\vw^\star, b^\star)$
+cùng các nhân tử $(\alpha_j)_{j \ne i}$ cho bài toán lề cứng trên $D^{(-i)}$:
+\begin{itemize}
+  \item $\vw^\star = \sum_{j \ne i} \alpha_j y_j \phi(\vx_j)$ và $\sum_{j \ne i}\alpha_j y_j = 0$,
+        vì số hạng thứ $i$ bằng $0$;
+  \item khả thi gốc, $\alpha_j \ge 0$ và bù lệch với $j \ne i$ giữ nguyên từ bài toán đầy đủ.
+\end{itemize}
+Bài toán lồi với ràng buộc affine nên KKT là điều kiện đủ; do đó $(\vw^\star, b^\star)$ là nghiệm, và
+theo tính duy nhất là \emph{nghiệm duy nhất} trên $D^{(-i)}$. Vậy $f^{(-i)} = f$.
+
+\emph{Bước 3 (không có lỗi tại mẫu bị bỏ).} Từ khả thi gốc trên bài toán đầy đủ,
+$y_i f^{(-i)}(\vx_i) = y_i f(\vx_i) \ge 1 > 0$, nên mẫu $i$ được dự đoán đúng.
+
+\emph{Bước 4 (đếm).} Lỗi bỏ-một chỉ có thể xảy ra tại $i \in \SV$, do đó
+$\sum_i \ind{y_i f^{(-i)}(\vx_i) \le 0} \le \abs{\SV}$. Chia hai vế cho $n$.
 \end{proof}
+
+\begin{remark}\label{rem:B6-soft}
+(1) Nếu nghiệm đối ngẫu không duy nhất, cận đúng với mọi nghiệm $\valpha$, nên có thể chọn nghiệm
+có ít vector hỗ trợ nhất. (2) Với SVM lề mềm, lập luận giống hệt: mẫu có $\alpha_i = 0$ thỏa
+$y_i f(\vx_i) \ge 1$ (Định lý~\ref{thm:B2-dual}), và bỏ nó đi thì $(\alpha_j)_{j \ne i}$ vẫn thỏa KKT
+của bài toán mới. Khi nghiệm đối ngẫu có ít nhất một vector hỗ trợ tự do, $b^\star$ được xác định
+duy nhất nên $f^{(-i)} = f$ và cận vẫn đúng; Mục~\ref{sec:C4} kiểm chứng điều này bằng thực nghiệm.
+(3) Sai số bỏ-một là ước lượng gần không chệch của sai số kiểm tra khi huấn luyện trên $n - 1$ mẫu,
+nên tỉ lệ vector hỗ trợ cho một chặn trên dễ tính của sai số tổng quát hóa \citep{vapnik1995nature}:
+mô hình càng thưa (ít vector hỗ trợ) thì cận càng chặt.
+\end{remark}
