@@ -1,6 +1,55 @@
 % =====================================================================
-%  Kết luận (P1, viết cuối cùng)
+%  Kết luận (P1)
+%  Đã viết: Phần B, C1–C4. Chờ số liệu cuối của P2 (A, C5) và P3 (D)
+%  để điền các chỗ \todo.
 % =====================================================================
 \section{Kết luận}\label{sec:conclusion}
 
-\todo{Tóm tắt kết quả chính của các Phần A--D, hạn chế và hướng phát triển.}
+Báo cáo đã đi trọn chuỗi từ cơ sở lý thuyết của SVM và phương pháp hàm nhân, qua cài đặt từ đầu,
+tới thực nghiệm và ứng dụng. Các kết quả chính theo từng phần như sau.
+
+\paragraph{Lý thuyết (Phần B).} Mục~\ref{sec:theory} chứng minh đầy đủ sáu kết quả nền tảng. Bài toán
+cực đại lề tương đương quy hoạch toàn phương lồi $\min \frac12\norm{\vw}^2$ và có nghiệm duy nhất; bài
+toán đối ngẫu của SVM lề mềm chỉ phụ thuộc dữ liệu qua hàm nhân, và điều kiện KKT phân loại mỗi mẫu
+thành ngoài lề, trên lề hoặc vi phạm lề; SVM lề mềm chính là cực tiểu hóa rủi ro hinge có chính quy
+hóa với $C = 1/(\lambda n)$; định lý biểu diễn giải thích vì sao nghiệm chỉ cần $n$ hệ số; tổng, tích,
+giới hạn và hàm mũ của hàm nhân xác định dương vẫn xác định dương, kéo theo tính hợp lệ của hàm nhân
+Gauss; và tỉ lệ vector hỗ trợ chặn trên sai số bỏ-một. Trong quá trình chứng minh, hai giả thiết ngầm
+của đề bài được nêu rõ: mỗi lớp có ít nhất một mẫu (B1, B6) và giá trị tối ưu hữu hạn (B4).
+
+\paragraph{Cài đặt (Phần A).} \todo{P2: tóm tắt 2--3 câu kết quả của A1--A4: SMO, DCD, KRR, đa lớp,
+Platt scaling; mức sai lệch so với LIBSVM (hàm mục tiêu đối ngẫu, tập vector hỗ trợ, dự đoán).}
+
+\paragraph{Bài tập và thực nghiệm (Phần C).} Lời giải tay của C1 ($\vw = (1, 1)$, $b = -1$,
+$\valpha = (\frac12, \frac12, 1)$, độ rộng lề $\sqrt2$) và C2 (siêu phẳng tách XOR trong không gian
+đặc trưng của hàm nhân đa thức bậc hai, trùng với nghiệm lề cực đại $f(\vx) = -x_1x_2$) được SMO của
+nhóm và LIBSVM tìm lại chính xác. Khảo sát $C$ và $\gamma$ (C4) bằng kiểm định chéo lồng nhau cho sai
+số kiểm tra $7{,}0 \pm 1{,}1\%$ trên moons và $1{,}9 \pm 1{,}0\%$ trên breast cancer. Thực nghiệm xác
+nhận các dự đoán của lý thuyết: khi $C$ tăng, độ rộng lề và số vector hỗ trợ đều không tăng với mọi
+$\gamma$; $\gamma$ quá lớn dẫn tới ma trận Gram gần đơn vị và mô hình chỉ ghi nhớ dữ liệu huấn luyện;
+và cận $\text{LOO} \le \nsv/n$ đúng ở cả $62$ cấu hình đã thử. \todo{P2: 1--2 câu kết quả C5
+(thời gian SMO so với DCD khi $n$ tăng).}
+
+\paragraph{Ứng dụng (Phần D).} \todo{P3: tóm tắt 2--3 câu: dữ liệu thu thập được, mô hình tốt nhất
+và sai số khi chia theo phiên chụp, độ bền khi đổi thiết bị, khả năng dùng để kiểm tra nhãn gạo đặc sản.}
+
+\paragraph{Hạn chế.}
+\begin{itemize}
+  \item Cận bỏ-một của B6 thường lỏng: trên các cấu hình đã thử, sai số bỏ-một thực tế chỉ bằng khoảng
+        $0{,}36$--$0{,}37$ lần cận (trung vị). Với SVM lề mềm, cận chỉ được bảo đảm khi nghiệm có vector
+        hỗ trợ tự do; khi mọi $\alpha_i = C$, sai số bỏ-một có thể lên tới $100\%$ dù sai số kiểm định
+        chéo chỉ khoảng $17\%$.
+  \item Khảo sát C4 dùng hai bộ dữ liệu chuẩn và lưới thô ($6 \times 5$ giá trị); chưa chạy trên đặc
+        trưng hạt gạo của Phần D.
+  \item \todo{P2, P3: hạn chế của phần mình (ví dụ: giới hạn thời gian ở C5, kích thước và độ đa dạng
+        của dữ liệu gạo).}
+\end{itemize}
+
+\paragraph{Hướng phát triển.}
+\begin{itemize}
+  \item Thay cận $\nsv/n$ bằng các cận chặt hơn nhưng vẫn tính được sau một lần huấn luyện, như cận
+        span hoặc cận bán kính--lề, để dùng trực tiếp cho việc chọn siêu tham số.
+  \item Lặp lại khảo sát C4 trên đặc trưng hạt gạo để xem vùng $(C, \gamma)$ tốt có ổn định giữa các
+        phiên chụp và thiết bị hay không.
+  \item \todo{P2, P3: hướng phát triển cho phần cài đặt và ứng dụng.}
+\end{itemize}
