@@ -6,19 +6,210 @@
 \section{Cài đặt thuật toán}\label{sec:impl}
 \owner{P2}
 
+Toàn bộ các thuật toán trong Phần~A được cài đặt từ đầu bằng Python/NumPy trong thư viện \texttt{svmlib}, tuân theo giao diện tương thích \texttt{scikit-learn} (\texttt{fit}, \texttt{decision\_\allowbreak function}, \texttt{predict}, \texttt{predict\_\allowbreak proba}) để lắp trực tiếp vào \texttt{Pipeline} và kiểm định chéo lồng nhau ở Phần~C và Phần~D.
+
+% ---------------------------------------------------------------------
 \subsection{A1. Thuật toán SMO}\label{sec:A1}
-\todo{Bài toán đối ngẫu (dẫn Định lý~\ref{thm:B2-dual}); chọn cặp vi phạm KKT lớn nhất
-\citep{keerthi2001improvements}; cập nhật giải tích 2 biến \citep{platt1998smo};
-cập nhật gradient; tính $b$; 3 hàm nhân; pseudo-code; hình hội tụ.}
 
+\paragraph{Bài toán đối ngẫu và biến gradient.}
+Theo Định lý~\ref{thm:B2-dual}, bài toán đối ngẫu của SVM lề mềm với hàm nhân $k(\vx, \vz)$ là cực đại hóa hàm mục tiêu
+\begin{equation}\label{eq:A1-dual}
+  \Dual(\valpha) = \sum_{i=1}^{n} \alpha_i - \frac{1}{2}\valpha\T \mQ \valpha,
+  \qquad \text{với } 0 \le \alpha_i \le C,\; \vy\T\valpha = 0,
+\end{equation}
+trong đó $Q_{ij} = y_i y_j K_{ij}$ và $K_{ij} = k(\vx_i, \vx_j)$. Tương đương với quy ước của LIBSVM \citep{chang2011libsvm}, ta cực tiểu hóa $F(\valpha) = -\Dual(\valpha) = \frac{1}{2}\valpha\T\mQ\valpha - \ve\T\valpha$. Vector gradient của $F$ là
+\begin{equation}\label{eq:A1-grad}
+  \vect{G} = \nabla F(\valpha) = \mQ\valpha - \ve,
+  \qquad G_i = y_i\bigl(f(\vx_i) - b\bigr) - 1.
+\end{equation}
+Khi khởi tạo $\valpha = \vzero$, ta có ngay $\vect{G} = -\ve$. Từ $\vect{G}$, giá trị hàm mục tiêu đối ngẫu được tính trực tiếp trong $O(n)$ mà không cần nhân lại $\mQ\valpha$:
+\begin{equation}\label{eq:A1-dual-from-G}
+  \Dual(\valpha) = -\frac{1}{2}\sum_{i=1}^{n}\alpha_i (G_i - 1).
+\end{equation}
+
+\paragraph{Chọn cặp vi phạm KKT lớn nhất (WSS1).}
+Dựa trên điều kiện tối ưu KKT dạng tương đương của \citet{keerthi2001improvements} và \citet{fan2005working}, định nghĩa hai tập chỉ số:
+\begin{align*}
+  \Iup(\valpha)  &= \{t : (y_t = +1 \text{ và } \alpha_t < C) \text{ hoặc } (y_t = -1 \text{ và } \alpha_t > 0)\}, \\
+  \Ilow(\valpha) &= \{t : (y_t = +1 \text{ và } \alpha_t > 0) \text{ hoặc } (y_t = -1 \text{ và } \alpha_t < C)\}.
+\end{align*}
+Tại mỗi vòng lặp, thuật toán chọn cặp $(i, j)$ vi phạm KKT lớn nhất:
+\begin{equation}\label{eq:A1-wss1}
+  i = \argmax_{t \in \Iup(\valpha)} (-y_t G_t), \qquad
+  j = \argmin_{t \in \Ilow(\valpha)} (-y_t G_t),
+\end{equation}
+và dừng khi độ vi phạm $m(\valpha) - M(\valpha) < \mathrm{tol}$, với $m(\valpha) = -y_i G_i$ và $M(\valpha) = -y_j G_j$.
+
+\paragraph{Cập nhật giải tích 2 biến và làm tròn biên.}
+Cố định mọi $\alpha_t$ ($t \notin \{i, j\}$), ràng buộc $\vy\T\valpha = 0$ và $0 \le \alpha_i, \alpha_j \le C$ giới hạn $\alpha_j$ vào đoạn $[L, H]$ \citep{platt1998smo}:
+\begin{equation*}
+  [L, H] = \begin{cases}
+    \bigl[\max(0, \alpha_j - \alpha_i),\; \min(C, C + \alpha_j - \alpha_i)\bigr], & \text{nếu } y_i \neq y_j, \\
+    \bigl[\max(0, \alpha_i + \alpha_j - C),\; \min(C, \alpha_i + \alpha_j)\bigr], & \text{nếu } y_i = y_j.
+  \end{cases}
+\end{equation*}
+Đặt $\eta = K_{ii} + K_{jj} - 2K_{ij}$; nếu $\eta \le 0$ (do sai số số học hoặc hai điểm trùng nhau), đặt $\eta = 10^{-12}$ như LIBSVM. Nghiệm cập nhật là
+\begin{equation}\label{eq:A1-update}
+  \alpha_j^{\text{new}} = \mathrm{clip}\!\left(\alpha_j + \frac{y_j(y_i G_i - y_j G_j)}{\eta},\; L,\; H\right),
+  \qquad
+  \alpha_i^{\text{new}} = \alpha_i + y_i y_j (\alpha_j - \alpha_j^{\text{new}}).
+\end{equation}
+Một chi tiết kỹ thuật bắt buộc là \emph{làm tròn về đúng biên} với ngưỡng $\varepsilon = 10^{-12}C$: nếu $\alpha < \varepsilon$ thì gán $\alpha = 0$, nếu $\alpha > C - \varepsilon$ thì gán $\alpha = C$. Thiếu bước này, sai số dấu phẩy động để lại các giá trị cỡ $10^{-17}$ khiến điểm biên vẫn thuộc $\Iup/\Ilow$ và bị chọn lặp lại vô hạn với bước nhảy bằng $0$.
+
+\paragraph{Cập nhật gradient, tính $b$ và các hàm nhân.}
+Sau khi cập nhật $(\alpha_i, \alpha_j)$, vector $\vect{G}$ được cập nhật tăng dần trong $O(n)$ chỉ bằng hai cột $\mK_{:, i}$ và $\mK_{:, j}$:
+\begin{equation}\label{eq:A1-grad-update}
+  \vect{G} \leftarrow \vect{G} + \vy \odot \bigl(y_i \Delta\alpha_i \mK_{:, i} + y_j \Delta\alpha_j \mK_{:, j}\bigr),
+\end{equation}
+trong đó $\Delta\alpha_i = \alpha_i^{\text{new}} - \alpha_i$ và $\Delta\alpha_j = \alpha_j^{\text{new}} - \alpha_j$. Với $n \le 8000$, ma trận Gram $\mK$ được tính trước bằng phép nhân ma trận vector hóa; với $n$ lớn hơn (như Mục~\ref{sec:C5}), hai cột $\mK_{:, i}, \mK_{:, j}$ được tính động trong $O(nd)$ để bộ nhớ chỉ tốn $O(nd)$. Sau khi hội tụ, hệ số chặn $b$ là trung bình của $(-y_t G_t)$ trên tập vector hỗ trợ tự do $\{t : 0 < \alpha_t < C\}$; nếu tập này rỗng, đặt $b = \frac{1}{2}(m(\valpha) + M(\valpha))$.
+
+Thư viện hỗ trợ ba hàm nhân theo đúng quy ước của \texttt{scikit-learn}: tuyến tính $k(\vx,\vz) = \vx\T\vz$, đa thức $k(\vx,\vz) = (\gamma\vx\T\vz + c_0)^d$, và Gauss $k(\vx,\vz) = \exp(-\gamma\norm{\vx - \vz}^2)$ tính nhanh qua đẳng thức $\norm{\vx - \vz}^2 = \norm{\vx}^2 + \norm{\vz}^2 - 2\vx\T\vz$. Cả ba đều vượt qua kiểm tra tính bán xác định dương (mọi trị riêng của $\mK$ đều $\ge -10^{-10}$).
+
+\begin{algorithm}[!htbp]
+\caption{Thuật toán SMO chọn cặp vi phạm KKT lớn nhất (WSS1)}\label{alg:A1-smo}
+\begin{algorithmic}[1]
+\Require Dữ liệu $\{(\vx_t, y_t)\}_{t=1}^n$ với $y_t \in \{-1, +1\}$, tham số $C > 0$, hàm nhân $k$, ngưỡng $\mathrm{tol}$
+\Ensure Hệ số đối ngẫu $\valpha$, hệ số chặn $b$, tập vector hỗ trợ $\SV$
+\State Khởi tạo $\valpha \leftarrow \vzero$, $\vect{G} \leftarrow -\ve$, $\varepsilon \leftarrow 10^{-12}C$
+\For{$\text{iter} = 1, 2, \dots, \text{max\_iter}$}
+  \State Xác định $\Iup(\valpha)$, $\Ilow(\valpha)$ và chọn $(i, j)$ theo \eqref{eq:A1-wss1}
+  \If{$-y_i G_i - (-y_j G_j) < \mathrm{tol}$}
+    \State \textbf{break} \Comment{Đạt điều kiện dừng KKT}
+  \EndIf
+  \State Tính cận $[L, H]$ và $\eta \leftarrow \max(K_{ii} + K_{jj} - 2K_{ij},\, 10^{-12})$
+  \State Cập nhật $\alpha_j^{\text{new}}, \alpha_i^{\text{new}}$ theo \eqref{eq:A1-update} và làm tròn biên theo ngưỡng $\varepsilon$
+  \State $\Delta\alpha_i \leftarrow \alpha_i^{\text{new}} - \alpha_i$, \; $\Delta\alpha_j \leftarrow \alpha_j^{\text{new}} - \alpha_j$
+  \State $\alpha_i \leftarrow \alpha_i^{\text{new}}$, \; $\alpha_j \leftarrow \alpha_j^{\text{new}}$
+  \State Cập nhật $\vect{G}$ theo \eqref{eq:A1-grad-update} dùng hai cột $\mK_{:, i}, \mK_{:, j}$
+\EndFor
+\State Tính $b$ từ tập $\{t : 0 < \alpha_t < C\}$ (hoặc $\frac{1}{2}(m(\valpha) + M(\valpha))$ nếu rỗng); $\SV \leftarrow \{t : \alpha_t > \varepsilon\}$
+\end{algorithmic}
+\end{algorithm}
+
+Hình~\ref{fig:A1-convergence} minh họa đường hội tụ của SMO trên tập dữ liệu Moons ($n = 300$, $\mathrm{tol} = 10^{-6}$). Hàm mục tiêu đối ngẫu $\Dual(\valpha)$ tăng đơn điệu và tiệm cận nhanh giá trị tối ưu; với $C$ lớn hơn ($C=10$) hoặc hàm nhân đa thức bậc~3, số vòng lặp tăng lên ($1\,137$ và $902$ vòng so với $160$ vòng ở RBF $C=1$) nhưng độ vi phạm KKT $m(\valpha) - M(\valpha)$ đều giảm ổn định xuống dưới $10^{-6}$.
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=\linewidth]{A1_convergence.pdf}
+  \caption{Đường hội tụ hàm mục tiêu đối ngẫu $\Dual(\valpha)$ (trái) và độ vi phạm điều kiện KKT theo thang log (phải) của thuật toán SMO trên tập Moons ($n=300$, $\mathrm{tol}=10^{-6}$).}\label{fig:A1-convergence}
+\end{figure}
+
+% ---------------------------------------------------------------------
 \subsection{A2. Hạ tọa độ đối ngẫu và hồi quy Ridge hàm nhân}\label{sec:A2}
-\todo{DCD cho SVM tuyến tính \citep{hsieh2008dual}; kernel ridge regression với
-nghiệm dạng đóng $\valpha = (\mK + \lambda\mI)^{-1}\vy$.}
 
+\paragraph{Hạ tọa độ đối ngẫu (DCD) cho SVM tuyến tính.}
+Với SVM tuyến tính trên dữ liệu lớn, \citet{hsieh2008dual} loại bỏ ràng buộc đẳng thức $\vy\T\valpha = 0$ bằng cách gộp hệ số chặn $b$ vào vector trọng số: mở rộng mỗi mẫu thành $\tilde{\vx}_i = (\vx_i\T, 1)\T \in \R^{d+1}$ và $\tilde{\vw} = (\vw\T, b)\T$. Bài toán đối ngẫu chỉ còn ràng buộc hộp $0 \le \alpha_i \le C$:
+\begin{equation}\label{eq:A2-dcd-dual}
+  \min_{\vzero \le \valpha \le C\ve}\; \frac{1}{2}\norm{\sum_{i=1}^{n} \alpha_i y_i \tilde{\vx}_i}^2 - \sum_{i=1}^{n} \alpha_i.
+\end{equation}
+\emph{Lưu ý:} cách mở rộng này chính quy hóa cả hệ số chặn $b$ (thêm $\frac{1}{2}b^2$ vào hàm mục tiêu gốc), tương đồng với \texttt{LinearSVC(loss="hinge", dual=True)} của LIBLINEAR nhưng khác nhẹ với SMO (vốn không phạt $b$).
+
+Ưu điểm cốt lõi của DCD là duy trì trực tiếp $\tilde{\vw} = \sum_i \alpha_i y_i \tilde{\vx}_i$. Ở mỗi bước duyệt tọa độ $i$ (theo hoán vị ngẫu nhiên từng epoch), đạo hàm riêng $G = y_i \tilde{\vw}\T\tilde{\vx}_i - 1$ và bước cập nhật
+\begin{equation*}
+  \alpha_i^{\text{new}} = \mathrm{clip}\!\left(\alpha_i - \frac{G}{\norm{\tilde{\vx}_i}^2},\; 0,\; C\right),
+  \qquad
+  \tilde{\vw} \leftarrow \tilde{\vw} + (\alpha_i^{\text{new}} - \alpha_i) y_i \tilde{\vx}_i
+\end{equation*}
+chỉ tốn $O(d)$ phép toán. Gradient chiếu $PG$ bằng $0$ khi biến đã nằm ở biên và gradient hướng ra ngoài biên; thuật toán kết hợp kỹ thuật thu gọn tập hoạt động (\emph{active-set shrinking}) của \citet{hsieh2008dual} và dừng khi $PG_{\max} - PG_{\min} \le \mathrm{tol}$ trên toàn bộ $n$ mẫu (Thuật toán~\ref{alg:A2-dcd}).
+
+\begin{algorithm}[!htbp]
+\caption{Hạ tọa độ đối ngẫu có thu gọn tập hoạt động (DCD)}\label{alg:A2-dcd}
+\begin{algorithmic}[1]
+\Require Dữ liệu mở rộng $\{\tilde{\vx}_i, y_i\}_{i=1}^n$, $Q_{ii} = \norm{\tilde{\vx}_i}^2$, tham số $C > 0$, ngưỡng $\mathrm{tol}$
+\Ensure $\tilde{\vw} = (\vw\T, b)\T$, $\valpha$
+\State Khởi tạo $\valpha \leftarrow \vzero$, $\tilde{\vw} \leftarrow \vzero$, tập hoạt động $A \leftarrow \{1, \dots, n\}$, $M_{\text{old}} \leftarrow +\infty$, $m_{\text{old}} \leftarrow -\infty$
+\For{$\text{epoch} = 1, 2, \dots, \text{max\_iter}$}
+  \State $M_{\text{new}} \leftarrow -\infty$, \; $m_{\text{new}} \leftarrow +\infty$
+  \For{mỗi $i$ theo hoán vị ngẫu nhiên của $A$}
+    \State $G \leftarrow y_i \tilde{\vw}\T \tilde{\vx}_i - 1$
+    \State Nếu ($\alpha_i = 0$ và $G > M_{\text{old}}$) hoặc ($\alpha_i = C$ và $G < m_{\text{old}}$): loại $i$ khỏi $A$, tiếp tục
+    \State Tính gradient chiếu $PG$; cập nhật $M_{\text{new}} \leftarrow \max(M_{\text{new}}, PG)$, $m_{\text{new}} \leftarrow \min(m_{\text{new}}, PG)$
+    \If{$\abs{PG} > 10^{-12}$}
+      \State $\alpha_i^{\text{new}} \leftarrow \mathrm{clip}(\alpha_i - G/Q_{ii},\, 0,\, C)$
+      \State $\tilde{\vw} \leftarrow \tilde{\vw} + (\alpha_i^{\text{new}} - \alpha_i) y_i \tilde{\vx}_i$; \; $\alpha_i \leftarrow \alpha_i^{\text{new}}$
+    \EndIf
+  \EndFor
+  \If{$M_{\text{new}} - m_{\text{new}} \le \mathrm{tol}$}
+    \State Nếu $\abs{A} = n$ thì \textbf{break}; ngược lại khôi phục $A \leftarrow \{1, \dots, n\}$, $M_{\text{old}} \leftarrow +\infty$, $m_{\text{old}} \leftarrow -\infty$
+  \Else
+    \State $M_{\text{old}} \leftarrow M_{\text{new}}$ (nếu $>0$, else $+\infty$); \; $m_{\text{old}} \leftarrow m_{\text{new}}$ (nếu $<0$, else $-\infty$)
+  \EndIf
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\paragraph{Hồi quy Ridge hàm nhân (KRR).}
+Bài toán hồi quy bình phương tối thiểu có chính quy hóa trong RKHS $\Hk$ cực tiểu hóa $\frac{1}{2}\sum_{i=1}^n (y_i - f(\vx_i))^2 + \frac{\lambda}{2}\Hnorm{f}^2$. Theo định lý biểu diễn, $f(\vx) = \sum_{i=1}^n \alpha_i k(\vx_i, \vx)$ với nghiệm dạng đóng thỏa mãn hệ phương trình tuyến tính đối xứng xác định dương:
+\begin{equation}\label{eq:A2-krr}
+  (\mK + \lambda \mI)\valpha = \vy.
+\end{equation}
+Trong \texttt{svmlib/krr.py}, hệ \eqref{eq:A2-krr} được giải trực tiếp bằng phân rã Cholesky (\texttt{scipy.linalg.\allowbreak cho\_factor} và \texttt{cho\_solve}, dự phòng \texttt{np.linalg.\allowbreak solve} nếu $\lambda = 0$), tránh hoàn toàn việc tính ma trận nghịch đảo tường minh để đảm bảo ổn định số học.
+
+% ---------------------------------------------------------------------
 \subsection{A3. Mở rộng đa lớp và Platt scaling}\label{sec:A3}
-\todo{Một-đấu-một, một-đấu-phần còn lại; Platt scaling \citep{platt1999probabilistic, lin2007note};
-pairwise coupling \citep{wu2004probability}; reliability diagram, Brier score.}
 
+\paragraph{Chiến lược đa lớp OvO và OvR.}
+Thư viện \texttt{svmlib/multiclass.py} cài đặt hai chiến lược mở rộng từ SVM nhị phân cho bài toán $K$ lớp:
+\begin{itemize}
+  \item \textbf{Một-đấu-một (OvO):} huấn luyện $\binom{K}{2}$ bộ phân loại nhị phân cho từng cặp lớp $(c_i, c_j)$. Khi dự đoán, mỗi bộ phân loại bỏ một phiếu cho lớp thắng; nếu xảy ra hòa phiếu, lớp có tổng giá trị hàm quyết định $\sum f_{ij}(\vx)$ lớn hơn được chọn.
+  \item \textbf{Một-đấu-phần còn lại (OvR):} huấn luyện $K$ bộ phân loại nhị phân (lớp $c$ mang nhãn $+1$, các lớp còn lại $-1$) và dự đoán lớp $\argmax_{c} f_c(\vx)$.
+\end{itemize}
+
+\paragraph{Platt scaling và xác suất đa lớp.}
+Để biến đầu ra không hiệu chỉnh $f(\vx)$ thành xác suất hậu nghiệm, \citet{platt1999probabilistic} khớp mô hình logistic
+\begin{equation}\label{eq:A3-platt}
+  P(y = +1 \mid f) = \frac{1}{1 + \exp(A f + B)},
+\end{equation}
+với hai tham số $(A, B)$ tìm bằng cách cực tiểu hóa hàm mất mát log-likelihood âm trên các nhãn mục tiêu đã làm mịn $t_+ = \frac{N_+ + 1}{N_+ + 2}$ và $t_- = \frac{1}{N_- + 2}$ nhằm tránh quá khớp khi dữ liệu khả tách. Thư viện \texttt{svmlib/platt.py} cài đặt phương pháp Newton có tìm kiếm đường lui (\emph{backtracking line search}) ổn định số học theo \citet{lin2007note}. Quan trọng là các giá trị $f_i$ dùng để khớp $(A, B)$ được tạo ra từ \emph{kiểm định chéo nội bộ 5-fold phân tầng} (out-of-fold), không lấy trực tiếp trên tập huấn luyện.
+
+Với bài toán đa lớp, OvR chuẩn hóa trực tiếp vector xác suất Platt từng lớp để tổng bằng $1$; trong khi OvO kết hợp ma trận xác suất từng cặp $r_{ij} = P(y = c_i \mid y \in \{c_i, c_j\}, \vx)$ bằng thuật toán \emph{pairwise coupling} (Thuật toán~2 của \citet{wu2004probability}) giải bài toán tối ưu lồi tìm vector xác suất $\vect{p}$ thỏa mãn $\sum_{k=1}^K p_k = 1$.
+
+Hình~\ref{fig:A3-calibration} trình bày biểu đồ độ tin cậy (\emph{reliability diagram}) và chỉ số Brier score. Trên bài toán nhị phân Moons ($n_{\mathrm{test}} = 200$), Platt scaling đưa đường hiệu chỉnh sát đường chéo lý tưởng và giảm Brier score từ $0.0789$ (dùng sigmoid thô $\sigma(f)$) xuống $0.0514$. Trên bài toán 5 lớp ($n_{\mathrm{test}} = 180$), cả OvO + pairwise coupling (độ chính xác $83.9\%$, Brier $0.2251$) lẫn OvR (độ chính xác $83.3\%$, Brier $0.2180$) đều cho xác suất hiệu chỉnh tốt, sẵn sàng dùng cho ngưỡng từ chối dự đoán ở Phần~D5.
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=\linewidth]{A3_calibration.pdf}
+  \caption{Biểu đồ độ tin cậy (Reliability Diagram) và chỉ số Brier score của Platt scaling cho phân loại nhị phân (trái) và đa lớp 5 lớp với OvO + pairwise coupling và OvR (phải).}\label{fig:A3-calibration}
+\end{figure}
+
+% ---------------------------------------------------------------------
 \subsection{A4. Đối chiếu với LIBSVM}\label{sec:A4}
-\todo{Bảng so sánh với LIBSVM \citep{chang2011libsvm} qua scikit-learn \citep{pedregosa2011scikit}:
-hàm mục tiêu đối ngẫu, tập vector hỗ trợ, $b$, dự đoán; nêu ngưỡng sai số cho phép.}
+
+Để kiểm chứng tính đúng đắn của cài đặt, bộ kiểm thử tự động \texttt{tests/\allowbreak test\_vs\_libsvm.py} (48 ca kiểm thử \texttt{pytest}) đối chiếu trực tiếp \texttt{svmlib} với LIBSVM \citep{chang2011libsvm} thông qua \texttt{scikit-learn} \citep{pedregosa2011scikit}. Cả hai bên đều dùng ngưỡng dừng chặt $\mathrm{tol} = 10^{-6}$ và truyền tường minh các tham số $\gamma, d, c_0$. Hàm mục tiêu đối ngẫu phía \texttt{sklearn} được tính lại bằng $\sum_s \abs{\alpha_s y_s} - \frac{1}{2}(\valpha_{\SV}\odot\vy_{\SV})\T \mK_{\SV\SV}(\valpha_{\SV}\odot\vy_{\SV})$, và tập vector hỗ trợ được lọc theo ngưỡng $\alpha_i > 10^{-6}C$.
+
+Toàn bộ 48/48 ca kiểm thử đều đạt (\texttt{PASSED}):
+\begin{itemize}
+  \item \textbf{Hàm nhân và bài giải tay C1:} Cả 3 hàm nhân khớp \texttt{sklearn.\allowbreak metrics.\allowbreak pairwise} tới sai số $< 10^{-12}$ và đều bán xác định dương. Trên dữ liệu bài C1, SMO hội tụ đúng về $\vw = (1, 1)\T$, $b = -1$, $\valpha = (0.5, 0.5, 1)\T$, $\Dual(\valpha) = 1$, cả 3 điểm đều là vector hỗ trợ.
+  \item \textbf{SMO nhị phân so với LIBSVM (36 cấu hình = 4 bộ dữ liệu $\times$ 3 hàm nhân $\times$ 3 giá trị $C \in \{0.1, 1, 10\}$):} Sai lệch tương đối hàm mục tiêu đối ngẫu lớn nhất chỉ là $7.69 \times 10^{-12}$ (thấp hơn rất nhiều ngưỡng yêu cầu $10^{-4}$), $\max\abs{\Delta b} = 4.96 \times 10^{-6}$, tập vector hỗ trợ trùng khớp hoàn toàn ở cả 36/36 cấu hình ($\abs{\SV_{\text{svmlib}} \triangle \SV_{\text{LIBSVM}}} = 0$), và dự đoán khớp $100\%$ trên tất cả các mẫu. Bảng~\ref{tab:A4-libsvm} trích dẫn 12 cấu hình đại diện (4 bộ dữ liệu $\times$ 3 hàm nhân tại $C = 1.0$) cùng dòng tổng hợp cực đại trên toàn bộ 36 cấu hình.
+  \item \textbf{DCD, KRR và đa lớp:} \texttt{LinearSVMDCD} khớp \texttt{LinearSVC(loss="hinge", dual=True)} trên Breast Cancer với sai lệch hàm mục tiêu gốc $< 10^{-3}$ và độ khớp dự đoán $\ge 99\%$; \texttt{KernelRidge} khớp \texttt{sklearn.\allowbreak kernel\_ridge.\allowbreak KernelRidge} với sai số tuyệt đối $< 10^{-8}$; \texttt{SVC} đa lớp OvO khớp $100\%$ dự đoán của LIBSVM trên cả Iris và Wine khi lắp trong \texttt{Pipeline(StandardScaler, SVC)}.
+\end{itemize}
+
+\begin{table}[!htbp]
+\centering
+\caption{Đối chiếu \texttt{svmlib.SVC} với LIBSVM (\texttt{sklearn.svm.SVC}) tại $\mathrm{tol}=10^{-6}$ (12 cấu hình đại diện ở $C=1.0$ và tổng hợp toàn bộ 36 cấu hình).}\label{tab:A4-libsvm}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}llrrrrrr@{}}
+\toprule
+Bộ dữ liệu & Hàm nhân & $\Dual_{\text{svmlib}}$ & $\frac{\abs{\Dual_{\text{svmlib}} - \Dual_{\text{LIBSVM}}}}{\max(1, \abs{\Dual_{\text{LIBSVM}}})}$ & $\abs{\Delta b}$ & $\nsv$ (chênh) & Khớp dự đoán & Vòng SMO \\
+\midrule
+Moons ($n=200$) & linear & 65.226694 & $4.68 \times 10^{-13}$ & $2.78 \times 10^{-6}$ & 70 (0) & 100.0\% & 345 \\
+Moons ($n=200$) & poly   & 21.587039 & $8.23 \times 10^{-15}$ & $1.17 \times 10^{-6}$ & 32 (0) & 100.0\% & 318 \\
+Moons ($n=200$) & rbf    & 27.790313 & $2.49 \times 10^{-14}$ & $1.92 \times 10^{-7}$ & 45 (0) & 100.0\% & 161 \\
+Breast Cancer ($n=569$) & linear & 26.525455 & $4.84 \times 10^{-13}$ & $1.02 \times 10^{-7}$ & 40 (0) & 100.0\% & 5\,828 \\
+Breast Cancer ($n=569$) & poly   & 24.963312 & $1.25 \times 10^{-13}$ & $2.69 \times 10^{-7}$ & 69 (0) & 100.0\% & 3\,601 \\
+Breast Cancer ($n=569$) & rbf    & 59.752115 & $4.36 \times 10^{-14}$ & $9.55 \times 10^{-8}$ & 146 (0) & 100.0\% & 752 \\
+Iris nhị phân ($n=100$) & linear & 0.619028  & $1.93 \times 10^{-12}$ & $6.32 \times 10^{-8}$ & 4 (0)  & 100.0\% & 42 \\
+Iris nhị phân ($n=100$) & poly   & 0.223990  & $1.01 \times 10^{-13}$ & $8.35 \times 10^{-8}$ & 6 (0)  & 100.0\% & 100 \\
+Iris nhị phân ($n=100$) & rbf    & 3.767773  & $2.29 \times 10^{-12}$ & $1.73 \times 10^{-7}$ & 26 (0) & 100.0\% & 539 \\
+Synthetic ($n=180$)     & linear & 86.565863 & $3.45 \times 10^{-15}$ & $7.97 \times 10^{-7}$ & 90 (0) & 100.0\% & 7\,547 \\
+Synthetic ($n=180$)     & poly   & 30.037510 & $1.03 \times 10^{-13}$ & $4.09 \times 10^{-7}$ & 63 (0) & 100.0\% & 2\,684 \\
+Synthetic ($n=180$)     & rbf    & 57.707161 & $5.80 \times 10^{-14}$ & $8.64 \times 10^{-9}$ & 110 (0) & 100.0\% & 664 \\
+\midrule
+\multicolumn{2}{@{}l}{\textbf{Tổng hợp 36 cấu hình ($C \in \{0.1, 1, 10\}$)}} & \textbf{---} & $\mathbf{\le 7.69 \times 10^{-12}}$ & $\mathbf{\le 4.96 \times 10^{-6}}$ & \textbf{chênh 0/36} & \textbf{100.0\%} & \textbf{24--48\,587} \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{remark}
+LIBSVM sử dụng chiến lược chọn cặp bậc hai WSS2 \citep{fan2005working} thay vì bậc nhất WSS1 nên đường hội tụ và số vòng lặp khác với cài đặt của chúng tôi; tuy nhiên do bài toán đối ngẫu \eqref{eq:A1-dual} là bài toán lồi, nghiệm tối ưu cuối cùng trùng khớp hoàn toàn trong sai số cho phép. Tương tự, xác suất Platt của \texttt{sklearn} dùng chia fold ngẫu nhiên nội bộ riêng nên không khớp tuyệt đối từng chữ số thập phân, nhưng đều hội tụ về cùng phân phối xác suất hiệu chỉnh.
+\end{remark}
